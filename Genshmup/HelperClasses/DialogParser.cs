@@ -10,7 +10,7 @@ namespace Genshmup.HelperClasses
     public class Dialog : IEnumerator<DialogElement>, IEnumerable<DialogElement>
     {
         object IEnumerator.Current => Current;
-        public DialogElement Current {  get => _current; }
+        public DialogElement Current { get => _current; }
 
         private int position;
 
@@ -18,8 +18,9 @@ namespace Genshmup.HelperClasses
 
         public bool MoveNext()
         {
-            if (elements.Length == 0) return false;
-            _current = elements[++position];
+            if (elements.Length == 0 || position >= elements.Length - 1) return false;
+            position++;
+            _current = elements[position];
             return position < elements.Length;
         }
         public void Reset()
@@ -71,29 +72,31 @@ namespace Genshmup.HelperClasses
                 if (lines[i].StartsWith("#")) continue;
                 if (lines[i].StartsWith("["))
                 {
-                    currentAuthor = lines[i].Substring(1, lines[i].IndexOf("]") - 1);
+                    currentAuthor = lines[i][1..lines[i].IndexOf("]")];
                     continue;
                 }
                 else if (currentAuthor == "") throw new Exception("No Author was specified before declaring a Dialog Line");
                 if (lines[i].StartsWith("!"))
-                    dialogElements.Add(new DialogElement(ElementType.BigTextLine, lines[i].Substring(1).Trim(), currentAuthor));
+                    dialogElements.Add(new DialogElement(ElementType.BigTextLine, lines[i][1..].Trim(), currentAuthor));
                 else if (lines[i].StartsWith("§"))
-                    dialogElements.Add(new DialogElement(ElementType.HardcodeEvent, lines[i].Substring(1).Trim(), currentAuthor));
+                    dialogElements.Add(new DialogElement(ElementType.HardcodeEvent, lines[i][1..].Trim(), currentAuthor));
                 else if (lines[i].StartsWith(">"))
                 {
                     List<string> choices = new();
                     bool start = false;
+                    string content = lines[i][1..((lines[i].Contains('{') ? lines[i].IndexOf("{") : lines[i].Length) - 1)].Trim();
                     for (int ii = i; true; ii++)
                     {
-                        if (!start && lines[ii].IndexOf("{") >= 0) start = true;
+                        if (!start && lines[ii].Contains('{')) start = true;
                         if (!start) continue;
-                        choices.AddRange(RemoveEmpty(lines[ii].Substring(Math.Min(0, lines[ii].IndexOf("{"))).Split('{', ',', '\n', '}')));
-                        if (lines[ii].IndexOf("}") >= 0) {
-                            i = ii + 1;
-                            break; 
+                        choices.AddRange(RemoveEmpty(lines[ii][(lines[ii].Contains('{') ? lines[ii].IndexOf("{") : 0)..].Split('{', ',', '\n', '}')));
+                        if (lines[ii].Contains('}'))
+                        {
+                            i = ii;
+                            break;
                         }
                     }
-                    dialogElements.Add(new DialogElement(lines[i].Substring(1, (lines[i].IndexOf("{") >= 0 ? lines[i].IndexOf("{") : lines[i].Length) - 1).Trim(), currentAuthor, choices.ToArray()));
+                    dialogElements.Add(new DialogElement(content, currentAuthor, choices.ToArray()));
                 }
                 else
                     dialogElements.Add(new DialogElement(ElementType.TextLine, lines[i], currentAuthor));
@@ -110,8 +113,8 @@ namespace Genshmup.HelperClasses
             {
                 if (de.Author != currentAuthor)
                 {
-                    res += $"[{currentAuthor}]\n";
                     currentAuthor = de.Author;
+                    res += $"[{currentAuthor}]\n";
                 }
                 res += de.Stringify();
             }
@@ -123,7 +126,7 @@ namespace Genshmup.HelperClasses
     {
         public string Author { get; set; }
         public string Content { get; set; }
-        public ElementType Type {  get; set; }
+        public ElementType Type { get; set; }
         public string[]? Choices { get; set; }
 
         public DialogElement(ElementType type, string content, string author)
