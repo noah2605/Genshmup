@@ -98,6 +98,11 @@ namespace Genshmup.HelperClasses
                     }
                     dialogElements.Add(new DialogElement(content, currentAuthor, choices.ToArray()));
                 }
+                else if (lines[i].StartsWith("|"))
+                {
+                    int condition = Convert.ToInt32(lines[i][1..lines[i].IndexOf("|", 1)]);
+                    dialogElements.Add(new DialogElement(lines[i][1..].Trim(), currentAuthor, condition));
+                }
                 else
                     dialogElements.Add(new DialogElement(ElementType.TextLine, lines[i], currentAuthor));
             }
@@ -105,6 +110,7 @@ namespace Genshmup.HelperClasses
             return Dialog.FromArray(dialogElements.ToArray());
         }
 
+        // Warning: Not necessarily reversable (yet)
         public static string Stringify(Dialog dlg)
         {
             string res = "";
@@ -128,10 +134,12 @@ namespace Genshmup.HelperClasses
         public string Content { get; set; }
         public ElementType Type { get; set; }
         public string[]? Choices { get; set; }
+        public int? Condition { get; set; }
 
         public DialogElement(ElementType type, string content, string author)
         {
             if (type == ElementType.Prompt) throw new ArgumentException("Prompt Type has to use the Constructor with Choices");
+            else if (type == ElementType.Conditional) throw new ArgumentException("Conditional Type has to use the Constructor with a Condition");
             Type = type;
             Content = content;
             Author = author;
@@ -144,13 +152,28 @@ namespace Genshmup.HelperClasses
             Author = author;
             Choices = choices;
         }
+        public DialogElement(string content, string author, int condition)
+        {
+            Type = ElementType.Conditional;
+            Content = content;
+            Author = author;
+            Condition = condition;
+        }
+        public DialogElement(ElementType type, string content, string author, string[]? choices, int? condition)
+        {
+            Type = type;
+            Content = content;
+            Author = author;
+            Choices = choices;
+            Condition = condition;
+        }
 
         public string Stringify()
         {
-            if (Type != ElementType.Prompt)
-                return $"{new string[] { "", "!", ">", "§" }[(int)Type]}{Content}\n";
-            else
-                return $"{new string[] { "", "!", ">", "§" }[(int)Type]}{Content} {{ {string.Join(", ", Choices ?? Array.Empty<string>())} }}\n";
+            string res = $"{new string[] { "", "!", ">", "§", "" }[(int)Type]}{Content}\n";
+            if (Type == ElementType.Prompt) res += $"{{ {string.Join(", ", Choices ?? Array.Empty<string>())} }}\n";
+            if (Type == ElementType.Conditional) res = $"|{Condition}|" + res;
+            return res;
         }
     }
 
@@ -159,6 +182,7 @@ namespace Genshmup.HelperClasses
         TextLine = 0,
         BigTextLine = 1,
         Prompt = 2,
-        HardcodeEvent = 3
+        HardcodeEvent = 3,
+        Conditional = 4
     }
 }

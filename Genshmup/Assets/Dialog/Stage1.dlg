@@ -12,7 +12,12 @@ Hmm?
 	None of your business
 	Haven't you heard the noise?
 }
-Yeah, of course. Something seems to be up ahead but I'm afraid i can't let you pass
+|0| Hey why so rude
+[Kakbrazeus]
+|0| Sorry just in a hurry right now
+[Ganyu]
+|1| Yes exactly!
+Something seems to be up ahead but I'm afraid i can't let you pass
 [Kakbrazeus]
 Why not?
 [Ganyu]
@@ -29,4 +34,3 @@ See?!
 I won't go easy on you, I hope you are ok with that
 [Kakbrazeus]
 Yes sure whatever you say my beloved
-§Init
