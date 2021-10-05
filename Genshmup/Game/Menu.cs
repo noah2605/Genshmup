@@ -29,8 +29,8 @@ namespace Genshmup.Game
                 switch (eventName)
                 {
                     case "Up":
-                        _nextScreen = 0;
-                        return LogicExit.ScreenChange;
+                        SelectedIndex++;
+                        return LogicExit.Nothing;
                 }
             }
             return base.Logic(events);

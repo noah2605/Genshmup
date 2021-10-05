@@ -2,24 +2,48 @@
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net6.0-windows</TargetFramework>
+    <TargetFramework>net6.0-windows7.0</TargetFramework>
     <Nullable>enable</Nullable>
     <UseWindowsForms>true</UseWindowsForms>
+    <SupportedOSPlatformVersion>7.0</SupportedOSPlatformVersion>
+    <UseWPF>False</UseWPF>
+    <StartupObject>Genshmup.Program</StartupObject>
+    <ApplicationIcon>Assets\ganyu.ico</ApplicationIcon>
+    <DebugType>portable</DebugType>
+    <GenerateDocumentationFile>False</GenerateDocumentationFile>
+    <ProduceReferenceAssembly>False</ProduceReferenceAssembly>
+    <SignAssembly>True</SignAssembly>
+    <ErrorReport>send</ErrorReport>
+    <BaseOutputPath>bin\</BaseOutputPath>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <PlatformTarget>AnyCPU</PlatformTarget>
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Assets\Dialog\Stage1.dlg" />
     <None Remove="Assets\ganyu.ico" />
-    <None Remove="Assets\Stage 3\ganyu.png" />
+    <None Remove="Assets\Stage 1\ganyu.png" />
     <None Remove="Assets\Sys\Splash.png" />
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="Assets\ganyu.ico" />
-    <Resource Include="Assets\Stage 3\ganyu.png" />
+    <Content Include="Assets\ganyu.ico" />
   </ItemGroup>
 
   <ItemGroup>
-    <SplashScreen Include="Assets\Sys\Splash.png" />
+    <EmbeddedResource Include="Assets\Dialog\Stage1.dlg" />
+    <EmbeddedResource Include="Assets\ganyu.ico" />
+    <EmbeddedResource Include="Assets\Stage 1\ganyu.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Assets\Sys\Splash.png" />
   </ItemGroup>
 
 </Project>

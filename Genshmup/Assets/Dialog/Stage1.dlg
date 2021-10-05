@@ -1,0 +1,24 @@
+﻿# [Character]
+# Normal Text Line
+# !Big Text
+# >Prompt
+# {Answer 1, Answer 2}
+# # Comment
+# Space acts as escape sequence, Dialog will be trimmed automatically
+# §Hardcode Event
+[Ganyu]
+Hmm?
+>Oh Kakbrazeus what are you doing here? {
+	None of your business
+	Haven't you heard the noise?
+}
+Yeah, of course. Something seems to be up ahead but I'm afraid i can't let you pass
+[Kakbrazeus]
+Why not?
+[Ganyu]
+Well, fight me please
+[Kakbrazeus]
+What
+[Ganyu]
+I have a strong Adeptus-Feeling some strong stuff might be ahead and.. i don't want you to get hurt
+So I'm testing you

@@ -1,11 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Data;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using Genshmup.HelperClasses;
 using Genshmup.Game;
@@ -14,25 +10,26 @@ namespace Genshmup
 {
     public partial class MainForm : Form
     {
-        Graphics g;
-
-        public readonly static Rectangle ClientRect = new(0, 0, 480, 360);
+        private Graphics g;
+        private BufferedGraphics buffer;
 
         private int phase = 0;
 
         private readonly static Menu menu = new();
+        private readonly static Stage[] stages;
 
         public MainForm()
         {
             InitializeComponent();
             MinimumSize = Size;
             MaximumSize = Size;
+
+            g = CreateGraphics();
+            buffer = BufferedGraphicsManager.Current.Allocate(g, ClientRectangle);
         }
 
         private void MainForm_Load(object sender, EventArgs e)
         {
-            g = CreateGraphics();
-
             gameTimer.Interval = 15;
             gameTimer.Enabled = true;
         }
@@ -40,7 +37,9 @@ namespace Genshmup
         private void Render()
         {
             if (phase == 0)
-                menu.Render(g);
+                menu.Render(buffer.Graphics);
+
+            buffer.Render(g);
         }
 
         private void Logic()
