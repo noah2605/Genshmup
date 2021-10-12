@@ -15,5 +15,9 @@ namespace Genshmup.HelperClasses
             for (int i = 0; i < elements.Length; i++)
                 g.DrawImage(atlas, positions[i], elements[i], GraphicsUnit.Pixel);
         }
+        public static Color ColorFromUInt(uint h)
+        {
+            return Color.FromArgb((int)h);
+        }
     }
 }

@@ -48,6 +48,8 @@
             this.Name = "MainForm";
             this.Text = "Genshmup";
             this.Load += new System.EventHandler(this.MainForm_Load);
+            this.SizeChanged += new System.EventHandler(this.MainForm_SizeChanged);
+            this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.MainForm_KeyDown);
             this.ResumeLayout(false);
 
         }

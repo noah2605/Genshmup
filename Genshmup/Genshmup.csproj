@@ -5,7 +5,6 @@
     <TargetFramework>net6.0-windows7.0</TargetFramework>
     <Nullable>enable</Nullable>
     <UseWindowsForms>true</UseWindowsForms>
-    <SupportedOSPlatformVersion>7.0</SupportedOSPlatformVersion>
     <UseWPF>False</UseWPF>
     <StartupObject>Genshmup.Program</StartupObject>
     <ApplicationIcon>Assets\ganyu.ico</ApplicationIcon>
@@ -44,6 +43,10 @@
 
   <ItemGroup>
     <EmbeddedResource Include="Assets\Sys\Splash.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Xam.Plugin.SimpleAudioPlayer" Version="1.5.0" />
   </ItemGroup>
 
   <ItemGroup>

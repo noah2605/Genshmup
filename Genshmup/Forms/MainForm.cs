@@ -15,14 +15,23 @@ namespace Genshmup
 
         private int phase = 0;
 
-        private readonly static Menu menu = new();
-        private readonly static Stage[] stages;
+        private HelperClasses.Screen[] screens = new HelperClasses.Screen[5];
+
+        private List<string> eventBuffer = new List<string>();
 
         public MainForm()
         {
             InitializeComponent();
-            MinimumSize = Size;
-            MaximumSize = Size;
+            MinimumSize = new Size(96, 72);
+
+            screens = new HelperClasses.Screen[]
+            {
+                new Menu(),
+                new Stage1(),
+                new Stage2(),
+                new Stage3(),
+                new Credits()
+            };
 
             g = CreateGraphics();
             buffer = BufferedGraphicsManager.Current.Allocate(g, ClientRectangle);
@@ -36,27 +45,46 @@ namespace Genshmup
 
         private void Render()
         {
-            if (phase == 0)
-                menu.Render(buffer.Graphics);
+            buffer.Graphics.ScaleTransform(Width/480.0f, Height/360.0f);
+            screens[phase].Render(buffer.Graphics);
+            buffer.Graphics.ResetTransform();
 
             buffer.Render(g);
         }
 
-        private void Logic()
+        private bool Logic()
         {
-            if (phase == 0)
+            LogicExit le = screens[phase].Logic(eventBuffer.ToArray());
+            if (le == LogicExit.CloseApplication)
             {
-                LogicExit le = menu.Logic(Array.Empty<string>());
-                if (le == LogicExit.CloseApplication) Close();
-                else if (le == LogicExit.ScreenChange) phase = menu.NextScreen;
+                Close();
+                return true;
             }
+            else if (le == LogicExit.ScreenChange) phase = Math.Max(0, Math.Min(screens[phase].NextScreen, screens.Length));
+            eventBuffer.Clear();
+            return false;
         }
 
         private void GameTick(object sender, EventArgs e)
         {
-            Logic();
+            if (Logic()) return;
 
             Render();
+        }
+
+        private void MainForm_KeyDown(object sender, KeyEventArgs e)
+        {
+            string? ev = Enum.GetName(e.KeyCode);
+            if (ev != null) eventBuffer.Add(ev);
+        }
+
+        private void MainForm_SizeChanged(object sender, EventArgs e)
+        {
+            try
+            {
+                buffer = BufferedGraphicsManager.Current.Allocate(g, ClientRectangle);
+            }
+            catch { }
         }
     }
 }

@@ -57,7 +57,7 @@ namespace Genshmup.HelperClasses
         private static string[] RemoveEmpty(string[] inp)
         {
             List<string> res = new();
-            foreach (string s in inp) if (!string.IsNullOrEmpty(s)) res.Add(s);
+            foreach (string s in inp) if (!string.IsNullOrEmpty(s.Trim())) res.Add(s);
             return res.ToArray();
         }
 
@@ -110,7 +110,7 @@ namespace Genshmup.HelperClasses
             return Dialog.FromArray(dialogElements.ToArray());
         }
 
-        // Warning: Not necessarily reversable (yet)
+        // Warning: Not necessarily reversable
         public static string Stringify(Dialog dlg)
         {
             string res = "";
@@ -173,6 +173,7 @@ namespace Genshmup.HelperClasses
             string res = $"{new string[] { "", "!", ">", "§", "" }[(int)Type]}{Content}\n";
             if (Type == ElementType.Prompt) res += $"{{ {string.Join(", ", Choices ?? Array.Empty<string>())} }}\n";
             if (Type == ElementType.Conditional) res = $"|{Condition}|" + res;
+            if (Type == ElementType.TextLine) res = " " + res;
             return res;
         }
     }

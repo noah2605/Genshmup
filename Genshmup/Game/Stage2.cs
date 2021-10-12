@@ -3,10 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Genshmup.HelperClasses;
 
 namespace Genshmup.Game
 {
-    internal class Stage2
+    public class Stage2 : Screen
     {
+
     }
 }
