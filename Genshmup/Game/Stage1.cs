@@ -14,10 +14,20 @@ namespace Genshmup.Game
     {
         private Player player = new Player();
 
+        private Image Kakbrazeus;
+
+        private Font titlefont;
+        private StringFormat sf;
+
         public Stage1()
         {
-            
+            Kakbrazeus = Image.FromStream(ResourceLoader.LoadResource(null, "kakbrazeus.png") ?? System.IO.Stream.Null);
+            titlefont = new Font(ResourceLoader.LoadFont(Assembly.GetExecutingAssembly(), "menu.ttf") ?? new FontFamily(GenericFontFamilies.Serif), 36);
+            sf = new StringFormat();
+            sf.Alignment = StringAlignment.Center;
+            sf.LineAlignment = StringAlignment.Near;
         }
+
         public override void Init()
         {
 
@@ -36,11 +46,11 @@ namespace Genshmup.Game
                 // Draw BG
                 g.Clear(Color.Black);
 
-                // Sidebar
+                // Dialog
+
 
                 // Danmaku
-                Rectangle CR = new Rectangle(0, 0, 240, 360);
-                
+                g.DrawImage(Kakbrazeus, player.Position);
             }
             catch
             {
@@ -55,16 +65,16 @@ namespace Genshmup.Game
                 switch (eventName)
                 {
                     case "Up":
-
+                        player.Move(Direction.Up);
                         break;
                     case "Down":
-
+                        player.Move(Direction.Down);
                         break;
                     case "Left":
-                        
+                        player.Move(Direction.Left);
                         break;
                     case "Right":
-                        
+                        player.Move(Direction.Right);
                         break;
                     case "Enter":
                     case "Z":

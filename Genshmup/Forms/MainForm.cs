@@ -67,7 +67,7 @@ namespace Genshmup
                 phase = Math.Max(0, Math.Min(screens[phase].NextScreen, screens.Length));
                 screens[phase].Init();
             }
-            eventBuffer.Clear();
+            if (phase == 0) eventBuffer.Clear(); // BIOS Input for Menu
             return false;
         }
 
@@ -81,7 +81,13 @@ namespace Genshmup
         private void MainForm_KeyDown(object sender, KeyEventArgs e)
         {
             string? ev = Enum.GetName(e.KeyCode);
-            if (ev != null) eventBuffer.Add(ev);
+            if (ev == null || eventBuffer.Contains(ev) && phase == 0) return;
+            eventBuffer.Add(ev);
+        }
+        private void MainForm_KeyUp(object sender, KeyEventArgs e)
+        {
+            string? ev = Enum.GetName(e.KeyCode);
+            if (ev != null) eventBuffer.RemoveAll(i => i == ev);
         }
 
         private void MainForm_SizeChanged(object sender, EventArgs e)

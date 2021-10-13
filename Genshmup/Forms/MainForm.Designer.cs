@@ -35,6 +35,7 @@
             // 
             // gameTimer
             // 
+            this.gameTimer.Interval = 10;
             this.gameTimer.Tick += new System.EventHandler(this.GameTick);
             // 
             // MainForm
@@ -49,8 +50,8 @@
             this.Text = "Genshmup";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.MainForm_FormClosing);
             this.Load += new System.EventHandler(this.MainForm_Load);
-            this.SizeChanged += new System.EventHandler(this.MainForm_SizeChanged);
             this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.MainForm_KeyDown);
+            this.KeyUp += new System.Windows.Forms.KeyEventHandler(this.MainForm_KeyUp);
             this.ResumeLayout(false);
 
         }
