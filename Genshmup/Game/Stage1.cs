@@ -21,6 +21,12 @@ namespace Genshmup.Game
 
         private Rectangle CR;
 
+        private Point[][] bulletPositions;
+
+        private Image bulletAtlas;
+
+        private Rectangle[] bulletElements;
+
         public Stage1()
         {
             Kakbrazeus = Image.FromStream(ResourceLoader.LoadResource(null, "kakbrazeus.png") ?? System.IO.Stream.Null);
@@ -28,6 +34,10 @@ namespace Genshmup.Game
             sf = new StringFormat();
             sf.Alignment = StringAlignment.Center;
             sf.LineAlignment = StringAlignment.Near;
+
+            bulletPositions = new Point[6][];
+            bulletElements = new Rectangle[6];
+            bulletAtlas = Image.FromStream(ResourceLoader.LoadResource(null, "bullets1.png") ?? System.IO.Stream.Null);
 
             CR = new Rectangle(0, 0, 480, 360);
         }
@@ -54,6 +64,8 @@ namespace Genshmup.Game
 
 
                 // Danmaku
+                DanmakuGraphics.RenderAtlas(g, bulletAtlas, bulletElements, bulletPositions);
+
                 g.DrawImage(Kakbrazeus, player.Position);
             }
             catch
