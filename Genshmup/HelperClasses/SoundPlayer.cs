@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using NAudio.Wave;
+using NAudio.Wave.SampleProviders;
 
 namespace Genshmup.HelperClasses
 {
@@ -26,8 +27,9 @@ namespace Genshmup.HelperClasses
         {
             WasapiOut ap = new();
             StreamMediaFoundationReader reader = new(ResourceLoader.LoadResource(null, name));
-            ap.Init(reader);
-            ap.Volume = sfx ? _sfxvolume : _volume;
+            VolumeSampleProvider prv = new VolumeSampleProvider(reader.ToSampleProvider());
+            prv.Volume = sfx ? _sfxvolume : _volume;
+            ap.Init(prv);
             ap.Play();
             audioPlayers.Add((ap, name, sfx));
             ap.PlaybackStopped += DeleteAudioPlayer;
@@ -37,8 +39,9 @@ namespace Genshmup.HelperClasses
         {
             WasapiOut ap = new();
             StreamMediaFoundationReader reader = new(ResourceLoader.LoadResource(null, name));
-            ap.Init(reader);
-            ap.Volume = _volume;
+            VolumeSampleProvider prv = new VolumeSampleProvider(reader.ToSampleProvider());
+            prv.Volume = _volume;
+            ap.Init(prv);
             ap.Play();
             audioPlayers.Add((ap, name, false));
             ap.PlaybackStopped += RenewLoop;
@@ -50,7 +53,8 @@ namespace Genshmup.HelperClasses
             else _volume = vol;
             for (int i = 0; i < audioPlayers.Count; i++)
             {
-                audioPlayers[i].Item1.Volume = audioPlayers[i].Item3 ? _sfxvolume : _volume;
+                for (int c = 0; c < audioPlayers[i].Item1.AudioStreamVolume.ChannelCount; c++)
+                    audioPlayers[i].Item1.AudioStreamVolume.SetChannelVolume(c, audioPlayers[i].Item3 ? _sfxvolume : _volume);
             }
         }
 
@@ -63,8 +67,9 @@ namespace Genshmup.HelperClasses
             audioPlayers.Remove(tuple);
             StreamMediaFoundationReader reader = new(ResourceLoader.LoadResource(null, tuple.Item2));
             ap = new WasapiOut();
-            ap.Init(reader);
-            ap.Volume = _volume;
+            VolumeSampleProvider prv = new VolumeSampleProvider(reader.ToSampleProvider());
+            prv.Volume = _volume;
+            ap.Init(prv);
             ap.Play();
             audioPlayers.Add((ap, tuple.Item2, tuple.Item3));
             ap.PlaybackStopped += DeleteAudioPlayer;

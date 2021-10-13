@@ -11,7 +11,7 @@ namespace Genshmup.HelperClasses
     {
         public override void Render(Graphics g)
         {
-
+            base.Render(g);
         }
 
         public override LogicExit Logic(string[] events)

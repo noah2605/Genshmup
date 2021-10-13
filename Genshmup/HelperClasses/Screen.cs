@@ -25,6 +25,13 @@ namespace Genshmup.HelperClasses
 
         public virtual LogicExit Logic(string[] events) 
         {
+            foreach (string ev in events)
+            switch (ev)
+            {
+                case "Escape":
+                    SoundPlayer.PlaySound("enter.wav", true);
+                    return LogicExit.CloseApplication;
+            }
             return 0;
         }
 

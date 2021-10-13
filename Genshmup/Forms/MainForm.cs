@@ -22,7 +22,8 @@ namespace Genshmup
         public MainForm()
         {
             InitializeComponent();
-            MinimumSize = new Size(96, 72);
+            MinimumSize = Size;
+            MaximumSize = Size;
 
             screens = new HelperClasses.Screen[]
             {
@@ -47,9 +48,7 @@ namespace Genshmup
 
         private void Render()
         {
-            buffer.Graphics.ScaleTransform(Width/480.0f, Height/360.0f);
             screens[phase].Render(buffer.Graphics);
-            buffer.Graphics.ResetTransform();
 
             buffer.Render(g);
         }
