@@ -19,6 +19,8 @@ namespace Genshmup.Game
         private Font titlefont;
         private StringFormat sf;
 
+        private Rectangle CR;
+
         public Stage1()
         {
             Kakbrazeus = Image.FromStream(ResourceLoader.LoadResource(null, "kakbrazeus.png") ?? System.IO.Stream.Null);
@@ -26,6 +28,8 @@ namespace Genshmup.Game
             sf = new StringFormat();
             sf.Alignment = StringAlignment.Center;
             sf.LineAlignment = StringAlignment.Near;
+
+            CR = new Rectangle(0, 0, 480, 360);
         }
 
         public override void Init()
