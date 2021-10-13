@@ -41,6 +41,8 @@ namespace Genshmup
         {
             gameTimer.Interval = 15;
             gameTimer.Enabled = true;
+
+            screens[0].Init();
         }
 
         private void Render()
@@ -60,7 +62,12 @@ namespace Genshmup
                 Close();
                 return true;
             }
-            else if (le == LogicExit.ScreenChange) phase = Math.Max(0, Math.Min(screens[phase].NextScreen, screens.Length));
+            else if (le == LogicExit.ScreenChange)
+            {
+                screens[phase].Dispose();
+                phase = Math.Max(0, Math.Min(screens[phase].NextScreen, screens.Length));
+                screens[phase].Init();
+            }
             eventBuffer.Clear();
             return false;
         }
@@ -85,6 +92,14 @@ namespace Genshmup
                 buffer = BufferedGraphicsManager.Current.Allocate(g, ClientRectangle);
             }
             catch { }
+        }
+
+        private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            foreach (HelperClasses.Screen s in screens)
+            {
+                s.Dispose();
+            }
         }
     }
 }

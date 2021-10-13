@@ -28,10 +28,11 @@ namespace Genshmup.Game
             "Exit"
         };
 
-        private Dictionary<string, (bool, int)> SettingItems = new Dictionary<string, (bool, int)>
+        private (string, bool, int)[] SettingItems =
         {
-            { "Volume", (false, 100) },
-            { "Keep Aspect Ratio", (true, 0) },
+            ("BGM Volume", false, 100),
+            ("SFX Volume", false, 100),
+            ("Keep Aspect Ratio", true, 0)
         };
 
         public Menu()
@@ -44,6 +45,16 @@ namespace Genshmup.Game
             sf.LineAlignment = StringAlignment.Near;
             sf.Trimming = StringTrimming.Word;
         }
+        public override void Init()
+        {
+            SoundPlayer.PlaySoundLoop("menu.flac");
+        }
+
+        public override void Dispose()
+        {
+            SoundPlayer.DisposeAll();
+            base.Dispose();
+        }
 
         public override void Render(Graphics g)
         {
@@ -53,7 +64,8 @@ namespace Genshmup.Game
                 g.Clear(Color.Black);
 
                 // Title
-                g.DrawString("Genshmup", font, new SolidBrush(DanmakuGraphics.ColorFromUInt(0xFFFFFFFF)), new Point(240, 0), sf);
+                g.DrawString(settings ? "Settings" : "Genshmup", font, 
+                    new SolidBrush(DanmakuGraphics.ColorFromUInt(0xFFFFFFFF)), new Point(240, 0), sf);
 
                 // Menu Items
                 if (!settings)
@@ -63,7 +75,21 @@ namespace Genshmup.Game
                         if (SelectedIndex == i)
                         {
                             g.DrawString(MenuItems[i], font, Brushes.White, new Point(80, 80 + i * 40), sf);
-                            g.DrawString(MenuItems[i], new Font(font, FontStyle.Bold), new SolidBrush(DanmakuGraphics.ColorFromUInt(0x7FFFFFFF)), new Point(80, 80 + i * 40), sf);
+                            g.DrawString(MenuItems[i], new Font(font, FontStyle.Bold), 
+                                new SolidBrush(DanmakuGraphics.ColorFromUInt(0x7FFFFFFF)), new Point(80, 80 + i * 40), sf);
+                        }
+                        else g.DrawString(MenuItems[i], font, Brushes.Gray, new Point(80, 80 + i * 40), sf);
+                    }
+                }
+                else
+                {
+                    for (int i = 0; i < SettingItems.Length; i++)
+                    {
+                        if (SelectedSettingsIndex == i)
+                        {
+                            g.DrawString(SettingItems[i].Item1, font, Brushes.White, new Point(80, 80 + i * 40), sf);
+                            g.DrawString(MenuItems[i], new Font(font, FontStyle.Bold), 
+                                new SolidBrush(DanmakuGraphics.ColorFromUInt(0x7FFFFFFF)), new Point(80, 80 + i * 40), sf);
                         }
                         else g.DrawString(MenuItems[i], font, Brushes.Gray, new Point(80, 80 + i * 40), sf);
                     }
@@ -82,15 +108,19 @@ namespace Genshmup.Game
                 switch (eventName)
                 {
                     case "Up":
+                        SoundPlayer.PlaySound("select.wav", true);
                         if (!settings) SelectedIndex = (SelectedIndex - 1) < 0 ? MenuItems.Length - 1 : (SelectedIndex - 1);
-                        else SelectedSettingsIndex = (SelectedSettingsIndex - 1) < 0 ? SettingItems.Count - 1 : (SelectedSettingsIndex - 1);
+                        else SelectedSettingsIndex = (SelectedSettingsIndex - 1) < 0 ? SettingItems.Length - 1 : (SelectedSettingsIndex - 1);
                         return LogicExit.Nothing;
                     case "Down":
-                        SelectedIndex = (SelectedIndex + 1) % MenuItems.Length;
+                        SoundPlayer.PlaySound("select.wav", true);
+                        if (!settings) SelectedIndex = (SelectedIndex + 1) % MenuItems.Length;
+                        else SelectedSettingsIndex = (SelectedSettingsIndex + 1) % SettingItems.Length;
                         return LogicExit.Nothing;
                     case "Enter":
                     case "Z":
                     case "Y":
+                        SoundPlayer.PlaySound("enter.wav");
                         switch (SelectedIndex)
                         {
                             case 0:
@@ -102,6 +132,11 @@ namespace Genshmup.Game
                             case 2:
                                 return LogicExit.CloseApplication;
                         }
+                        break;
+                    case "Escape":
+                        SoundPlayer.PlaySound("enter.wav", true);
+                        if (settings) settings = false;
+                        else return LogicExit.CloseApplication;
                         break;
                 }
             }

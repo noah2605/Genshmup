@@ -12,6 +12,11 @@ namespace Genshmup.HelperClasses
         public int NextScreen { get => _nextScreen; }
         protected int _nextScreen;
 
+        public virtual void Init()
+        {
+
+        }
+
         public virtual void Render(Graphics g)
         {
             g.Clear(Color.Black);
@@ -20,17 +25,10 @@ namespace Genshmup.HelperClasses
 
         public virtual LogicExit Logic(string[] events) 
         {
-            foreach (string s in events)
-            {
-                switch (s)
-                {
-                    case "close": return LogicExit.CloseApplication;
-                }
-            }
             return 0;
         }
 
-        public void Dispose()
+        public virtual void Dispose()
         {
             GC.SuppressFinalize(this);
         }
