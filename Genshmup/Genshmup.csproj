@@ -30,6 +30,7 @@
     <None Remove="Assets\Dialog\Stage2.dlg" />
     <None Remove="Assets\Dialog\Stage3.dlg" />
     <None Remove="Assets\ganyu.ico" />
+    <None Remove="Assets\kakbrazeus.png" />
     <None Remove="Assets\Stage 1\ganyu.png" />
     <None Remove="Assets\Sys\BGM\Menu.flac" />
     <None Remove="Assets\Sys\Sounds\boss_death.wav" />
@@ -53,6 +54,7 @@
     <EmbeddedResource Include="Assets\Dialog\Stage2.dlg" />
     <EmbeddedResource Include="Assets\Dialog\Stage3.dlg" />
     <EmbeddedResource Include="Assets\ganyu.ico" />
+    <EmbeddedResource Include="Assets\kakbrazeus.png" />
     <EmbeddedResource Include="Assets\Stage 1\ganyu.png" />
     <EmbeddedResource Include="Assets\Sys\BGM\menu.flac" />
     <EmbeddedResource Include="Assets\Sys\Sounds\boss_death.wav" />
