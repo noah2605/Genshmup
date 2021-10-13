@@ -35,8 +35,9 @@ namespace Genshmup.HelperClasses
             return 0;
         }
 
-        public virtual void Dispose()
+        public void Dispose()
         {
+            SoundPlayer.DisposeAll();
             GC.SuppressFinalize(this);
         }
     }

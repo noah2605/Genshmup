@@ -12,22 +12,38 @@ namespace Genshmup.Game
 {
     public class Stage1 : Stage
     {
-        private Player player = new Player();
+        private readonly Player player = new();
 
-        private Image Kakbrazeus;
+        private readonly Image Kakbrazeus;
 
-        private Font titlefont;
-        private StringFormat sf;
+        private readonly Font titlefont;
+        private readonly StringFormat sf;
 
         private Rectangle CR;
+
+        private readonly Point[][] bulletPositions;
+
+        private readonly Image bulletAtlas;
+
+        private readonly Rectangle[] bulletElements;
 
         public Stage1()
         {
             Kakbrazeus = Image.FromStream(ResourceLoader.LoadResource(null, "kakbrazeus.png") ?? System.IO.Stream.Null);
             titlefont = new Font(ResourceLoader.LoadFont(Assembly.GetExecutingAssembly(), "menu.ttf") ?? new FontFamily(GenericFontFamilies.Serif), 36);
-            sf = new StringFormat();
-            sf.Alignment = StringAlignment.Center;
-            sf.LineAlignment = StringAlignment.Near;
+            sf = new StringFormat
+            {
+                Alignment = StringAlignment.Center,
+                LineAlignment = StringAlignment.Near
+            };
+
+            bulletPositions = new Point[6][];
+            for (int i = 0; i < bulletPositions.Length; i++)
+            {
+                bulletPositions[i] = Array.Empty<Point>();
+            }
+            bulletElements = new Rectangle[6];
+            bulletAtlas = Image.FromStream(ResourceLoader.LoadResource(null, "bullets1.png") ?? System.IO.Stream.Null);
 
             CR = new Rectangle(0, 0, 480, 360);
         }
@@ -35,12 +51,6 @@ namespace Genshmup.Game
         public override void Init()
         {
 
-        }
-
-        public override void Dispose()
-        {
-            SoundPlayer.DisposeAll();
-            base.Dispose();
         }
 
         public override void Render(Graphics g)
@@ -54,6 +64,8 @@ namespace Genshmup.Game
 
 
                 // Danmaku
+                DanmakuGraphics.RenderAtlas(g, bulletAtlas, bulletElements, bulletPositions);
+
                 g.DrawImage(Kakbrazeus, player.Position);
             }
             catch

@@ -18,23 +18,22 @@ namespace Genshmup.Game
 
         private bool settings;
 
-        private Font itemfont;
-        private Font titlefont;
-        private StringFormat sf;
+        private readonly Font itemfont;
+        private readonly Font titlefont;
+        private readonly StringFormat sf;
 
-        private List<Image> renderedList;
+        private readonly List<Image> renderedList;
         private IEnumerator<Image> rendered;
+        readonly Point[] noisePoints = new Point[8];
 
-        Point[] noisePoints = new Point[8];
-
-        private string[] MenuItems =
+        private readonly string[] MenuItems =
         {
             "Play",
             "Settings",
             "Exit"
         };
 
-        private (string, bool, int)[] SettingItems =
+        private readonly (string, bool, int)[] SettingItems =
         {
             ("BGM Volume", false, 100),
             ("SFX Volume", false, 100),
@@ -64,12 +63,6 @@ namespace Genshmup.Game
             for (int i = 0; i < 30; i++)
                 renderedList.Add(GenerateNoise());
             rendered = renderedList.GetEnumerator();
-        }
-
-        public override void Dispose()
-        {
-            SoundPlayer.DisposeAll();
-            base.Dispose();
         }
 
         public override void Render(Graphics g)
@@ -134,7 +127,7 @@ namespace Genshmup.Game
             }
         }
 
-        private string ItemToString(bool type, int value)
+        private static string ItemToString(bool type, int value)
         {
             if (value == 0) return "Off";
             if (type) return "On";
@@ -144,8 +137,8 @@ namespace Genshmup.Game
         private Image GenerateNoise() { 
             int maxX = 100;
             int maxY = 100;
-            Bitmap bmp = new Bitmap(maxX, maxY);
-            Random rng = new Random(DateTime.Now.Millisecond);
+            Bitmap bmp = new(maxX, maxY);
+            Random rng = new(DateTime.Now.Millisecond);
             
 
             if (Point.Empty.Equals(noisePoints[0]))

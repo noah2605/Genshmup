@@ -18,5 +18,11 @@ namespace Genshmup.HelperClasses
         {
             return base.Logic(events);
         }
+
+        public override void Dispose()
+        {
+            SoundPlayer.DisposeAll();
+            base.Dispose();
+        }
     }
 }

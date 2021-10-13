@@ -10,14 +10,14 @@ namespace Genshmup
 {
     public partial class MainForm : Form
     {
-        private Graphics g;
+        private readonly Graphics g;
         private BufferedGraphics buffer;
 
         private int phase = 0;
 
-        private HelperClasses.Screen[] screens = new HelperClasses.Screen[5];
+        private readonly HelperClasses.Screen[] screens = new HelperClasses.Screen[5];
 
-        private List<string> eventBuffer = new List<string>();
+        private readonly List<string> eventBuffer = new();
 
         public MainForm()
         {

@@ -13,7 +13,7 @@ namespace Genshmup.HelperClasses
 {
     public static class ResourceLoader
     {
-        private static PrivateFontCollection _privateFontCollection;
+        private static readonly PrivateFontCollection _privateFontCollection;
 
         static ResourceLoader()
         {

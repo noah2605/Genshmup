@@ -21,13 +21,13 @@ namespace Genshmup.HelperClasses
             set { ChangeVolume(value, true); }
         }
 
-        private static List<(WasapiOut, string, bool)> audioPlayers = new();
+        private static readonly List<(WasapiOut, string, bool)> audioPlayers = new();
 
         public static void PlaySound(string name, bool sfx = false)
         {
             WasapiOut ap = new();
             StreamMediaFoundationReader reader = new(ResourceLoader.LoadResource(null, name));
-            VolumeSampleProvider prv = new VolumeSampleProvider(reader.ToSampleProvider());
+            VolumeSampleProvider prv = new(reader.ToSampleProvider());
             prv.Volume = sfx ? _sfxvolume : _volume;
             ap.Init(prv);
             ap.Play();
@@ -39,8 +39,10 @@ namespace Genshmup.HelperClasses
         {
             WasapiOut ap = new();
             StreamMediaFoundationReader reader = new(ResourceLoader.LoadResource(null, name));
-            VolumeSampleProvider prv = new VolumeSampleProvider(reader.ToSampleProvider());
-            prv.Volume = _volume;
+            VolumeSampleProvider prv = new(reader.ToSampleProvider())
+            {
+                Volume = _volume
+            };
             ap.Init(prv);
             ap.Play();
             audioPlayers.Add((ap, name, false));
@@ -61,13 +63,12 @@ namespace Genshmup.HelperClasses
         private static void RenewLoop(object? sender, EventArgs e)
         {
             if (sender == null) return;
-            WasapiOut? ap = sender as WasapiOut;
-            if (ap == null) return;
+            if (sender is not WasapiOut ap) return;
             (WasapiOut, string, bool) tuple = audioPlayers.Find(x => x.Item1 == ap);
             audioPlayers.Remove(tuple);
             StreamMediaFoundationReader reader = new(ResourceLoader.LoadResource(null, tuple.Item2));
             ap = new WasapiOut();
-            VolumeSampleProvider prv = new VolumeSampleProvider(reader.ToSampleProvider());
+            VolumeSampleProvider prv = new(reader.ToSampleProvider());
             prv.Volume = _volume;
             ap.Init(prv);
             ap.Play();
@@ -90,8 +91,7 @@ namespace Genshmup.HelperClasses
         private static void DeleteAudioPlayer(object? sender, EventArgs e)
         {
             if (sender == null) return;
-            WasapiOut? ap = sender as WasapiOut;
-            if (ap == null) return;
+            if (sender is not WasapiOut ap) return;
             ap.Stop();
             ap.Dispose();
             audioPlayers.Remove(audioPlayers.Find(x => x.Item1 == ap));
