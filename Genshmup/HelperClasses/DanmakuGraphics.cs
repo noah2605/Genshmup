@@ -13,7 +13,8 @@ namespace Genshmup.HelperClasses
         {
             if (elements.Length != positions.Length) throw new ArgumentException("Array of Elements not mappable to Array of Positions");
             for (int i = 0; i < elements.Length; i++)
-                g.DrawImage(atlas, positions[i], elements[i], GraphicsUnit.Pixel);
+                for (int ii = 0; ii < positions[i].Length; ii++)
+                    g.DrawImage(atlas, new Rectangle(positions[i][ii], new Size(16, 16)), elements[i], GraphicsUnit.Pixel);
         }
         public static Color ColorFromUInt(uint h)
         {

@@ -6,7 +6,8 @@ using System.Threading.Tasks;
 
 namespace Genshmup.HelperClasses
 {
-    internal class Ult
+    public class Bullet
     {
+        public BulletType bulletType;
     }
 }
