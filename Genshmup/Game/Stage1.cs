@@ -1,19 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Numerics;
 using Genshmup.HelperClasses;
 using System.Drawing;
 using System.Reflection;
 using System.Drawing.Text;
-using System.Windows.Forms;
+using System.IO;
 
 namespace Genshmup.Game
 {
     public class Stage1 : Stage
     {
+        private int keysleep = 20;
+
         private readonly Player player = new();
         private readonly Boss boss = new();
 
@@ -43,9 +43,17 @@ namespace Genshmup.Game
 
         private Point[][] bulletPositionsBoss;
         private readonly Rectangle[] bulletElementsBoss;
+        private Func<Vector2, Vector2>[] vectorFields;
+        private Vector2 EpiCenter;
 
         private bool gameover = false;
+        private bool dialog = true;
         private int selectedIndex = 0;
+
+        private string dialogString = "";
+        private Dialog parsedDialog;
+        private DialogElement currentElement = new DialogElement(ElementType.TextLine, "", "");
+        private int condition = 0;
 
         public Stage1()
         {
@@ -92,6 +100,16 @@ namespace Genshmup.Game
             rendered = renderedList.GetEnumerator();
 
             player.Lives = 3;
+            parsedDialog = DialogParser.Parse(new StreamReader(ResourceLoader.LoadResource(null, "Stage1.dlg") ?? Stream.Null).ReadToEnd());
+
+            vectorFields = new Func<Vector2, Vector2>[]
+            {
+                Straight,
+                Spiral,
+                Target
+            };
+
+            EpiCenter = new Vector2(boss.Position.X, boss.Position.Y);
         }
 
         public override void Init()
@@ -154,8 +172,40 @@ namespace Genshmup.Game
                 g.DrawImage(rendered.Current ?? renderedList.First(), new Rectangle(0, 0, 480, 360));
                 if (!rendered.MoveNext()) rendered.Reset();
 
+                // Figures
+                g.DrawImage(Kakbrazeus, player.Position);
+                g.DrawImage(Ganyu, boss.Position);
+
                 // Dialog
-                
+                if (dialog)
+                {
+                    g.FillRectangle(new SolidBrush(DanmakuGraphics.ColorFromUInt(0xA0000000)), new Rectangle(5, 205, 150, 35));
+                    g.DrawString(currentElement.Author, 
+                        new Font(titlefont.FontFamily, 16, FontStyle.Regular), Brushes.White, new Point(20, 210));
+
+                    g.FillRectangle(new SolidBrush(DanmakuGraphics.ColorFromUInt(0xA0000000)), new Rectangle(5, 245, 470, 110));
+                    if (currentElement.Type == ElementType.TextLine || currentElement.Type == ElementType.Conditional)
+                        g.DrawString(dialogString, new Font(titlefont.FontFamily, 16, FontStyle.Regular), 
+                            Brushes.White, new Rectangle(20, 260, 440, 90), 
+                            new StringFormat() { Trimming = StringTrimming.EllipsisWord });
+                    else if (currentElement.Type == ElementType.BigTextLine)
+                        g.DrawString(dialogString, new Font(titlefont.FontFamily, 72, FontStyle.Bold), Brushes.White, new Point(20, 260));
+                    else if (currentElement.Type == ElementType.Prompt)
+                    {
+                        g.DrawString(dialogString, new Font(titlefont.FontFamily, 16, FontStyle.Regular), 
+                            Brushes.White, new Rectangle(20, 260, 440, 90), 
+                            new StringFormat() { Trimming = StringTrimming.EllipsisWord });
+                        for (int i = 0; i < (currentElement.Choices == null ? 0 : currentElement.Choices.Length); i++)
+                        {
+                            g.FillRectangle(new SolidBrush(DanmakuGraphics.ColorFromUInt(0xA0000000)), new Rectangle(245, 205 - i * 40, 230, 40));
+                            if (condition == i)
+                                g.FillRectangle(new SolidBrush(DanmakuGraphics.ColorFromUInt(0xA0FFFFFF)), new Rectangle(245, 205 - i * 40, 230, 40));
+                            g.DrawString(currentElement.Choices[i], new Font(titlefont.FontFamily, 12, FontStyle.Regular), Brushes.White, new Point(205, 210 - i * 40));
+                        }
+                    }
+                    g.DrawString("Enter to continue", new Font(titlefont.FontFamily, 10, FontStyle.Regular), Brushes.White, new Point(360, 340));
+                    return;
+                }
 
                 // Danmaku
                 DanmakuGraphics.RenderAtlas(g, bulletAtlas, bulletElements, bulletPositions);
@@ -163,9 +213,22 @@ namespace Genshmup.Game
                 g.DrawString($"{_bulletCooldowns[1]}, {_bulletCooldowns[2]}\n{boss.Health}, {player.Lives}", titlefont, Brushes.White, new Point(240, 180), sf);
 
                 DanmakuGraphics.RenderAtlas(g, bulletAtlas, bulletElementsBoss, bulletPositionsBoss);
-                
-                g.DrawImage(Kakbrazeus, player.Position);
-                g.DrawImage(Ganyu, boss.Position);
+
+                // Game Over
+                if (gameover)
+                {
+                    Bitmap Bmp = new Bitmap(480, 360);
+                    using (Graphics gfx = Graphics.FromImage(Bmp))
+                    using (SolidBrush brush = new SolidBrush(Color.FromArgb(180, 0, 0, 0)))
+                    {
+                        gfx.FillRectangle(brush, 0, 0, 480, 360);
+                    }
+                    g.DrawImage(Bmp, new Point(0, 0));
+                    g.DrawString("Retry", new Font(titlefont, FontStyle.Bold), Brushes.Gray, new Point(80, 120));
+                    g.DrawString("Menu", new Font(titlefont, FontStyle.Bold), Brushes.Gray, new Point(80, 200));
+                    if (selectedIndex == 0) g.DrawString("Retry", titlefont, Brushes.White, new Point(80, 120));
+                    if (selectedIndex == 1) g.DrawString("Menu", titlefont, Brushes.White, new Point(80, 200));
+                }
             }
             catch
             {
@@ -186,12 +249,89 @@ namespace Genshmup.Game
         private void BossShoot(int type)
         {
             List<Point> pres = bulletPositionsBoss[type].ToList();
-            pres.Add(boss.Position);
+            pres.Add(new Point(boss.Position.X + 3, boss.Position.Y + 3));
             bulletPositionsBoss[type] = pres.ToArray();
         }
 
         public override LogicExit Logic(string[] events)
         {
+            List<string> ev = new();
+            for (int i = 0; i < events.Length; i++)
+                if (!ev.Contains(events[i])) ev.Add(events[i]);
+            events = ev.ToArray();
+
+            EpiCenter = new Vector2(boss.Position.X, boss.Position.Y);
+
+            // Dialog
+            if (dialog)
+            {
+                if (dialogString != currentElement.Content)
+                {
+                    dialogString += currentElement.Content[dialogString.Length];
+                }
+            }
+            //Key sleep (dialog before needs to work tho)
+            if (keysleep - 1 > 0)
+            {
+                keysleep--;
+                return LogicExit.Nothing;
+            }
+
+            if (dialog) {
+                if (dialogString == currentElement.Content)
+                {
+                    if (currentElement.Type == ElementType.Prompt)
+                    {
+                        foreach (string eventName in events)
+                        {
+                            switch (eventName)
+                            {
+                                case "Up":
+                                    SoundPlayer.PlaySound("select.wav", true);
+                                    condition = (condition + 1) % currentElement.Choices.Length;
+                                    keysleep = 10;
+                                    break;
+                                case "Down":
+                                    SoundPlayer.PlaySound("select.wav", true);
+                                    condition = ((condition - 1) >= 0 ? condition : currentElement.Choices.Length) - 1;
+                                    keysleep = 10;
+                                    break;
+                            }
+                        }
+                    }
+                    if (events.Contains("Enter") || events.Contains("Z") || events.Contains("Y"))
+                    {
+                        if (!parsedDialog.MoveNext())
+                        {
+                            dialog = false;
+                            return LogicExit.Nothing;
+                        }
+                        dialogString = "";
+                        currentElement = parsedDialog.Current;
+                        while (currentElement.Type == ElementType.Conditional && currentElement.Condition != condition)
+                        {
+                            if (!parsedDialog.MoveNext())
+                            {
+                                dialog = false;
+                                return LogicExit.Nothing;
+                            }
+                            currentElement = parsedDialog.Current;
+                        }
+                        keysleep = 20;
+                    }
+                }
+                else
+                {
+                    if (events.Contains("Enter") || events.Contains("Z") || events.Contains("Y"))
+                    {
+                        dialogString = currentElement.Content;
+                    }
+                }
+
+                return base.Logic(events);
+            }
+
+            // Game Over Screen
             if (gameover) 
             {
                 foreach (string eventName in events)
@@ -200,11 +340,13 @@ namespace Genshmup.Game
                     {
                         case "Up":
                             SoundPlayer.PlaySound("select.wav", true);
-                            selectedIndex = 0;
+                            selectedIndex = ((selectedIndex - 1) >= 0 ? selectedIndex : 2) - 1;
+                            keysleep = 20;
                             break;
                         case "Down":
                             SoundPlayer.PlaySound("select.wav", true);
-                            selectedIndex = 1;
+                            selectedIndex = (selectedIndex + 1) % 2;
+                            keysleep = 20;
                             break;
                         case "Enter":
                         case "Z":
@@ -216,6 +358,7 @@ namespace Genshmup.Game
                 return LogicExit.Nothing;
             }
 
+            // Check for Player Collisions
             for (int i1 = 0; i1 < bulletPositionsBoss.Length; i1++)
             {
                 Point[] pa = bulletPositionsBoss[i1];
@@ -223,8 +366,9 @@ namespace Genshmup.Game
                 {
                     Point ta = pa[i];
                     Rectangle t = new Rectangle(ta, new Size(16, 16));
-                    if (player.Rect.IntersectsWith(t))
+                    if (player.Hitbox.IntersectsWith(t))
                     {
+                        SoundPlayer.PlaySound("death.wav", true);
                         player.Lives--;
                         List<Point> bpb = bulletPositionsBoss[i1].ToList();
                         bpb.Remove(pa[i]);
@@ -233,29 +377,40 @@ namespace Genshmup.Game
                 }
             }
 
-            if (player.Lives == 0)
+            // Check for Game Over Condition
+            if (player.Lives <= 0)
             {
                 SoundPlayer.PlaySound("stage_failed.wav", true);
                 gameover = true;
             }
 
+            // Move boss (TO BE MADE UH.... BETTER)
             if (new Random().Next(0, 20) == 0)
             {
                 boss.Position = new Point(boss.Position.X + new Random().Next(-10, 10), boss.Position.Y + new Random().Next(-10, 10));
                 BossShoot(0);
                 boss.Bound(CR);
             }
+            if (boss.Health < 9000 && boss.Health > 8000)
+            {
+                BossShoot(1);
+            }
+
+            // She ded
             if (boss.Health <= 0)
             {
                 SoundPlayer.PlaySound("boss_death.wav", true);
                 _nextScreen = 2;
                 return LogicExit.ScreenChange;
             }
+
+            // Advance Boss Bullets
             for (int t = 0; t < bulletPositionsBoss.Length; t++)
             {
                 for (int i = 0; i < bulletPositionsBoss[t].Length; i++)
                 {
-                    bulletPositionsBoss[t][i].Y += 5;
+                    Vector2 cr = vectorFields[t](new Vector2(bulletPositionsBoss[t][i].X, bulletPositionsBoss[t][i].Y));
+                    bulletPositionsBoss[t][i] = new Point((int)cr.X, (int)cr.Y);
                 }
             }
 
@@ -266,7 +421,8 @@ namespace Genshmup.Game
                 for (int i = 0; i < bulletPositions[t].Length; i++)
                 {
                     bulletPositions[t][i].Y -= bulletSpeeds[t];
-                    if (t >= 1) bulletPositions[t][i].X -= (int)Math.Pow(t, 3) * (bulletPositions[t][i].X - boss.Position.X) / Math.Abs(bulletPositions[t][i].X - boss.Position.X);
+                    if (bulletPositions[t][i].X - boss.Position.X != 0)
+                        bulletPositions[t][i].X -= (int)Math.Pow(t + 1, 2) * (bulletPositions[t][i].X - boss.Position.X) / Math.Abs(bulletPositions[t][i].X - boss.Position.X);
                     if (boss.Rect.IntersectsWith(new Rectangle(bulletPositions[t][i], new Size(16, 16))))
                     {
                         List<Point> pres = bulletPositions[t].ToList();
@@ -328,6 +484,24 @@ namespace Genshmup.Game
 
             player.Bound(CR);
             return base.Logic(events);
+        }
+
+        private Vector2 Straight(Vector2 pos)
+        {
+            return new Vector2(0, 5) + pos;
+        }
+
+        private Vector2 Spiral(Vector2 pos)
+        {
+            Complex c = Complex.Exp(new Complex(0, Math.Atan2(pos.Y, pos.X) + 0.2)) * (pos.Length() + 2.5);
+            return EpiCenter + new Vector2((float)c.Real, (float)c.Imaginary);
+        }
+
+        private Vector2 Target(Vector2 pos)
+        {
+            Vector2 ppos = new Vector2(player.Position.X + 16, player.Position.Y + 16);
+            Vector2 bpos = new Vector2(boss.Position.X + 16, boss.Position.Y + 16);
+            return pos + new Vector2(0, 1) + (ppos - bpos) / 40;
         }
     }
 }

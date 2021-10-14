@@ -11,7 +11,7 @@ namespace Genshmup.HelperClasses
     public class Pattern
     {
         private Func<Point, Vector2> vectorField;
-
+        public Point Center { get; set; }
 
         public Vector2 VectorAt(Point pt)
         {

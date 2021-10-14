@@ -18,6 +18,7 @@ namespace Genshmup.HelperClasses
         public int Lives { get => _lives; set => _lives = value; }
 
         public Rectangle Rect { get => new(_position.X, _position.Y, _size.Width, _size.Height); }
+        public Rectangle Hitbox { get => new(_position.X + (_size.Width / 2) - 2, _position.Y + (_size.Height / 2) - 2, 4, 4); }
 
         public Player()
         {
