@@ -33,6 +33,7 @@
     <None Remove="Assets\ganyu.ico" />
     <None Remove="Assets\kakbrazeus.png" />
     <None Remove="Assets\Sys\BGM\Menu.flac" />
+    <None Remove="Assets\Sys\menu.ttf" />
     <None Remove="Assets\Sys\Sounds\boss_death.wav" />
     <None Remove="Assets\Sys\Sounds\death.wav" />
     <None Remove="Assets\Sys\Sounds\elem_1.wav" />
@@ -59,6 +60,7 @@
     <EmbeddedResource Include="Assets\kakbrazeus.png" />
     <EmbeddedResource Include="Assets\ganyu.png" />
     <EmbeddedResource Include="Assets\Sys\BGM\menu.flac" />
+    <EmbeddedResource Include="Assets\Sys\menu.ttf" />
     <EmbeddedResource Include="Assets\Sys\Sounds\boss_death.wav" />
     <EmbeddedResource Include="Assets\Sys\Sounds\death.wav" />
     <EmbeddedResource Include="Assets\Sys\Sounds\elem_1.wav" />

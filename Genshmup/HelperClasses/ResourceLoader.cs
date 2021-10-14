@@ -49,7 +49,7 @@ namespace Genshmup.HelperClasses
             {
                 handle.Free();
             }
-            return _privateFontCollection.Families.FirstOrDefault(x => x.Name == name);
+            return _privateFontCollection.Families.First();
         }
     }
 }
