@@ -101,7 +101,7 @@ namespace Genshmup.HelperClasses
                 else if (lines[i].StartsWith("|"))
                 {
                     int condition = Convert.ToInt32(lines[i][1..lines[i].IndexOf("|", 1)]);
-                    dialogElements.Add(new DialogElement(lines[i][1..].Trim(), currentAuthor, condition));
+                    dialogElements.Add(new DialogElement(lines[i][(lines[i].IndexOf("|", 1) + 1)..].Trim(), currentAuthor, condition));
                 }
                 else
                     dialogElements.Add(new DialogElement(ElementType.TextLine, lines[i], currentAuthor));

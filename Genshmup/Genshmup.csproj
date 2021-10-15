@@ -25,19 +25,21 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Assets\bullets1.png" />
     <None Remove="Assets\Dialog\Ending.dlg" />
     <None Remove="Assets\Dialog\Stage1.dlg" />
     <None Remove="Assets\Dialog\Stage2.dlg" />
     <None Remove="Assets\Dialog\Stage3.dlg" />
     <None Remove="Assets\ganyu.ico" />
     <None Remove="Assets\kakbrazeus.png" />
-    <None Remove="Assets\Stage 1\ganyu.png" />
     <None Remove="Assets\Sys\BGM\Menu.flac" />
+    <None Remove="Assets\Sys\menu.ttf" />
     <None Remove="Assets\Sys\Sounds\boss_death.wav" />
     <None Remove="Assets\Sys\Sounds\death.wav" />
     <None Remove="Assets\Sys\Sounds\elem_1.wav" />
     <None Remove="Assets\Sys\Sounds\enter.wav" />
     <None Remove="Assets\Sys\Sounds\select.wav" />
+    <None Remove="Assets\Sys\Sounds\shot.wav" />
     <None Remove="Assets\Sys\Sounds\stage_failed.wav" />
     <None Remove="Assets\Sys\Sounds\stage_intro.wav" />
     <None Remove="Assets\Sys\Sounds\ult_1.wav" />
@@ -49,19 +51,22 @@
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="Assets\bullets1.png" />
     <EmbeddedResource Include="Assets\Dialog\Ending.dlg" />
     <EmbeddedResource Include="Assets\Dialog\Stage1.dlg" />
     <EmbeddedResource Include="Assets\Dialog\Stage2.dlg" />
     <EmbeddedResource Include="Assets\Dialog\Stage3.dlg" />
     <EmbeddedResource Include="Assets\ganyu.ico" />
     <EmbeddedResource Include="Assets\kakbrazeus.png" />
-    <EmbeddedResource Include="Assets\Stage 1\ganyu.png" />
+    <EmbeddedResource Include="Assets\ganyu.png" />
     <EmbeddedResource Include="Assets\Sys\BGM\menu.flac" />
+    <EmbeddedResource Include="Assets\Sys\menu.ttf" />
     <EmbeddedResource Include="Assets\Sys\Sounds\boss_death.wav" />
     <EmbeddedResource Include="Assets\Sys\Sounds\death.wav" />
     <EmbeddedResource Include="Assets\Sys\Sounds\elem_1.wav" />
     <EmbeddedResource Include="Assets\Sys\Sounds\enter.wav" />
     <EmbeddedResource Include="Assets\Sys\Sounds\select.wav" />
+    <EmbeddedResource Include="Assets\Sys\Sounds\shot.wav" />
     <EmbeddedResource Include="Assets\Sys\Sounds\stage_failed.wav" />
     <EmbeddedResource Include="Assets\Sys\Sounds\stage_intro.wav" />
     <EmbeddedResource Include="Assets\Sys\Sounds\ult_1.wav" />

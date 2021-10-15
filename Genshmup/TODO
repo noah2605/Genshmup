@@ -1,2 +1,12 @@
 Screen Rendering into seperate Thread + opt. scaling
 
+Graphics for Combat
+
+Bullet Combat:
+
+Better Boss Movement
+Boss Bullet Patterns
+Power level of standard shot increases with E
+Q restores a life if successful
+
+fix the wobbly issue with the tracking bullets

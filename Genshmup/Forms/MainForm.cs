@@ -15,7 +15,7 @@ namespace Genshmup
 
         private int phase = 0;
 
-        private readonly HelperClasses.Screen[] screens = new HelperClasses.Screen[5];
+        private HelperClasses.Screen[] screens = new HelperClasses.Screen[5];
 
         private readonly List<string> eventBuffer = new();
 
@@ -63,8 +63,17 @@ namespace Genshmup
             }
             else if (le == LogicExit.ScreenChange)
             {
+                int nextScreen = screens[phase].NextScreen;
                 screens[phase].Dispose();
-                phase = Math.Max(0, Math.Min(screens[phase].NextScreen, screens.Length));
+                screens = new HelperClasses.Screen[]
+                {
+                    new Menu(),
+                    new Stage1(),
+                    new Stage2(),
+                    new Stage3(),
+                    new Credits()
+                };
+                phase = Math.Max(0, Math.Min(nextScreen, screens.Length));
                 screens[phase].Init();
             }
             if (phase == 0) eventBuffer.Clear(); // BIOS Input for Menu

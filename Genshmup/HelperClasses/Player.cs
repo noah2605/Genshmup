@@ -14,27 +14,33 @@ namespace Genshmup.HelperClasses
         public Size Size { get => _size; set => _size = value; }
         private Size _size;
 
+        private int _lives;
+        public int Lives { get => _lives; set => _lives = value; }
+
+        public Rectangle Rect { get => new(_position.X, _position.Y, _size.Width, _size.Height); }
+        public Rectangle Hitbox { get => new(_position.X + (_size.Width / 2) - 2, _position.Y + (_size.Height / 2) - 2, 4, 4); }
+
         public Player()
         {
             _size = new Size(32, 32);
-            _position = new Point(240 - _size.Width/2, 180 - _size.Height/2);
+            _position = new Point(240 - _size.Width / 2, 180 - _size.Height / 2);
         }
 
-        public void Move(Direction dir)
+        public void Move(Direction dir, int step)
         {
             switch (dir)
             {
                 case Direction.Up:
-                    _position.Y -= 10;
+                    _position.Y -= step;
                     break;
                 case Direction.Down:
-                    _position.Y += 10;
+                    _position.Y += step;
                     break;
                 case Direction.Left:
-                    _position.X -= 10;
+                    _position.X -= step;
                     break;
                 case Direction.Right:
-                    _position.X += 10;
+                    _position.X += step;
                     break;
             }
         }
