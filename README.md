@@ -1,2 +1,2 @@
 # Genshmup
-Genshin Themed Shoot'em Up with own Engine in .NET 6
+Genshin Touhou mix idk
