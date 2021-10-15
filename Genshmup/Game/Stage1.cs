@@ -13,6 +13,7 @@ namespace Genshmup.Game
     public class Stage1 : Stage
     {
         private int keysleep = 20;
+        private int deathprotection = 60;
 
         private readonly Player player = new();
         private readonly Boss boss = new();
@@ -46,13 +47,15 @@ namespace Genshmup.Game
         private Func<Vector2, Vector2>[] vectorFields;
         private Vector2 EpiCenter;
 
+
+
         private bool gameover = false;
         private bool dialog = true;
         private int selectedIndex = 0;
 
         private string dialogString = "";
         private Dialog parsedDialog;
-        private DialogElement currentElement = new DialogElement(ElementType.TextLine, "", "");
+        private DialogElement currentElement = new(ElementType.TextLine, "", "");
         private int condition = 0;
 
         public Stage1()
@@ -174,6 +177,10 @@ namespace Genshmup.Game
 
                 // Figures
                 g.DrawImage(Kakbrazeus, player.Position);
+                if (!dialog && deathprotection != 0)
+                {
+                    g.DrawEllipse(new Pen(Color.BlueViolet, 2.0f), player.Rect);
+                }
                 g.DrawImage(Ganyu, boss.Position);
 
                 // Dialog
@@ -200,7 +207,9 @@ namespace Genshmup.Game
                             g.FillRectangle(new SolidBrush(DanmakuGraphics.ColorFromUInt(0xA0000000)), new Rectangle(245, 205 - i * 40, 230, 40));
                             if (condition == i)
                                 g.FillRectangle(new SolidBrush(DanmakuGraphics.ColorFromUInt(0xA0FFFFFF)), new Rectangle(245, 205 - i * 40, 230, 40));
+#pragma warning disable CS8602
                             g.DrawString(currentElement.Choices[i], new Font(titlefont.FontFamily, 12, FontStyle.Regular), Brushes.White, new Point(190, 210 - i * 40));
+#pragma warning restore CS8602
                         }
                     }
                     g.DrawString("Enter to continue", new Font(titlefont.FontFamily, 10, FontStyle.Regular), Brushes.White, new Point(360, 340));
@@ -217,9 +226,9 @@ namespace Genshmup.Game
                 // Game Over
                 if (gameover)
                 {
-                    Bitmap Bmp = new Bitmap(480, 360);
+                    Bitmap Bmp = new(480, 360);
                     using (Graphics gfx = Graphics.FromImage(Bmp))
-                    using (SolidBrush brush = new SolidBrush(Color.FromArgb(180, 0, 0, 0)))
+                    using (SolidBrush brush = new(Color.FromArgb(180, 0, 0, 0)))
                     {
                         gfx.FillRectangle(brush, 0, 0, 480, 360);
                     }
@@ -271,13 +280,13 @@ namespace Genshmup.Game
                 }
             }
             //Key sleep (dialog before needs to work tho)
-            if (keysleep - 1 > 0)
+            if (keysleep - 1 >= 0)
             {
                 keysleep--;
                 return LogicExit.Nothing;
             }
-
-            if (dialog) {
+            if (dialog)
+            {
                 if (dialogString == currentElement.Content)
                 {
                     if (currentElement.Type == ElementType.Prompt)
@@ -288,12 +297,16 @@ namespace Genshmup.Game
                             {
                                 case "Up":
                                     SoundPlayer.PlaySound("select.wav", true);
+#pragma warning disable CS8602
                                     condition = (condition + 1) % currentElement.Choices.Length;
+#pragma warning restore CS8602
                                     keysleep = 10;
                                     break;
                                 case "Down":
                                     SoundPlayer.PlaySound("select.wav", true);
+#pragma warning disable CS8602
                                     condition = ((condition - 1) >= 0 ? condition : currentElement.Choices.Length) - 1;
+#pragma warning restore CS8602
                                     keysleep = 10;
                                     break;
                             }
@@ -301,6 +314,7 @@ namespace Genshmup.Game
                     }
                     if (events.Contains("Enter") || events.Contains("Z") || events.Contains("Y"))
                     {
+                        SoundPlayer.PlaySound("enter.wav", true);
                         if (!parsedDialog.MoveNext())
                         {
                             dialog = false;
@@ -330,6 +344,8 @@ namespace Genshmup.Game
 
                 return base.Logic(events);
             }
+            else
+                deathprotection = Math.Max(deathprotection - 1, 0);
 
             // Game Over Screen
             if (gameover) 
@@ -359,13 +375,14 @@ namespace Genshmup.Game
             }
 
             // Check for Player Collisions
+            if (deathprotection == 0)
             for (int i1 = 0; i1 < bulletPositionsBoss.Length; i1++)
             {
                 Point[] pa = bulletPositionsBoss[i1];
                 for (int i = 0; i < pa.Length; i++)
                 {
                     Point ta = pa[i];
-                    Rectangle t = new Rectangle(ta, new Size(16, 16));
+                    Rectangle t = new(ta, new Size(16, 16));
                     if (player.Hitbox.IntersectsWith(t))
                     {
                         SoundPlayer.PlaySound("death.wav", true);
@@ -373,6 +390,7 @@ namespace Genshmup.Game
                         List<Point> bpb = bulletPositionsBoss[i1].ToList();
                         bpb.Remove(pa[i]);
                         bulletPositionsBoss[i1] = bpb.ToArray();
+                        deathprotection = 60;
                     }
                 }
             }
@@ -390,10 +408,6 @@ namespace Genshmup.Game
                 boss.Position = new Point(boss.Position.X + new Random().Next(-10, 10), boss.Position.Y + new Random().Next(-10, 10));
                 BossShoot(0);
                 boss.Bound(CR);
-            }
-            if (boss.Health < 9000 && boss.Health > 8000)
-            {
-                BossShoot(1);
             }
 
             // She ded
@@ -493,14 +507,19 @@ namespace Genshmup.Game
 
         private Vector2 Spiral(Vector2 pos)
         {
-            Complex c = Complex.Exp(new Complex(0, Math.Atan2(pos.Y, pos.X) + 0.2)) * (pos.Length() + 2.5);
-            return EpiCenter + new Vector2((float)c.Real, (float)c.Imaginary);
+            pos -= EpiCenter;
+
+            Polar polar = new(pos.Length(), (float)Math.Atan2(pos.Y, pos.X));
+            polar.radius += 1;
+            polar.angle += 0.1f;
+
+            return EpiCenter + new Vector2(polar.radius * (float)Math.Cos(polar.angle), polar.radius * (float)Math.Sin(polar.angle));
         }
 
         private Vector2 Target(Vector2 pos)
         {
-            Vector2 ppos = new Vector2(player.Position.X + 16, player.Position.Y + 16);
-            Vector2 bpos = new Vector2(boss.Position.X + 16, boss.Position.Y + 16);
+            Vector2 ppos = new(player.Position.X + 16, player.Position.Y + 16);
+            Vector2 bpos = new(boss.Position.X + 16, boss.Position.Y + 16);
             return pos + new Vector2(0, 1) + (ppos - bpos) / 40;
         }
     }
