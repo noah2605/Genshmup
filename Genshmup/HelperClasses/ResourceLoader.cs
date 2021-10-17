@@ -23,13 +23,13 @@ namespace Genshmup.HelperClasses
         public static Stream? LoadResource(Assembly? a, string searchstring)
         {
             if (a == null) a = Assembly.GetExecutingAssembly();
-            return a.GetManifestResourceStream(a.GetManifestResourceNames().ToList().Find(val => val.Contains(searchstring)) ?? "plc");
+            return a.GetManifestResourceStream(a.GetManifestResourceNames().ToList().Find(val => val.Contains("." + searchstring)) ?? "plc");
         }
 
         public static FontFamily? LoadFont(Assembly? a, string name)
         {
             if (a == null) a = Assembly.GetExecutingAssembly();
-            Stream? st = a.GetManifestResourceStream(a.GetManifestResourceNames().ToList().Find(val => val.Contains(name)) ?? "plc");
+            Stream? st = a.GetManifestResourceStream(a.GetManifestResourceNames().ToList().Find(val => val.Contains("." + name)) ?? "plc");
             if (st == null) return null;
             List<byte> bytes = new();
             while (st.Position < st.Length)

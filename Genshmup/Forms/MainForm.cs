@@ -5,6 +5,7 @@ using System.Drawing;
 using System.Windows.Forms;
 using Genshmup.HelperClasses;
 using Genshmup.Game;
+using System.Threading;
 
 namespace Genshmup
 {
@@ -18,6 +19,8 @@ namespace Genshmup
         private HelperClasses.Screen[] screens = new HelperClasses.Screen[5];
 
         private readonly List<string> eventBuffer = new();
+
+        private Thread t;
 
         public MainForm()
         {
@@ -36,6 +39,8 @@ namespace Genshmup
 
             g = CreateGraphics();
             buffer = BufferedGraphicsManager.Current.Allocate(g, ClientRectangle);
+
+            t = new Thread(new ThreadStart(Render));
         }
 
         private void MainForm_Load(object sender, EventArgs e)
@@ -49,8 +54,6 @@ namespace Genshmup
         private void Render()
         {
             screens[phase].Render(buffer.Graphics);
-
-            buffer.Render(g);
         }
 
         private bool Logic()
@@ -63,6 +66,7 @@ namespace Genshmup
             }
             else if (le == LogicExit.ScreenChange)
             {
+                eventBuffer.Clear();
                 int nextScreen = screens[phase].NextScreen;
                 screens[phase].Dispose();
                 screens = new HelperClasses.Screen[]
@@ -82,9 +86,10 @@ namespace Genshmup
 
         private void GameTick(object sender, EventArgs e)
         {
+            Thread.Yield();
             if (Logic()) return;
-
             Render();
+            buffer.Render(g);
         }
 
         private void MainForm_KeyDown(object sender, KeyEventArgs e)
