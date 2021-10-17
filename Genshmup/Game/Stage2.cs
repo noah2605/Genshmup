@@ -27,8 +27,8 @@ namespace Genshmup.Game
         private readonly int movementSpeedShifting = 2;
         private bool shifting = false;
 
-        private readonly Image Kakbrazeus;
-        private readonly Image Dvalin;
+        private Image PlayerImage;
+        private Image BossImage;
 
         private readonly Font titlefont;
         private readonly StringFormat sf;
@@ -61,8 +61,8 @@ namespace Genshmup.Game
 
         public Stage2()
         {
-            Kakbrazeus = Image.FromStream(ResourceLoader.LoadResource(null, "kakbrazeus.png") ?? System.IO.Stream.Null);
-            Dvalin = Image.FromStream(ResourceLoader.LoadResource(null, "ganyu.png") ?? System.IO.Stream.Null);
+            PlayerImage = Image.FromStream(ResourceLoader.LoadResource(null, "kakbrazeus.png") ?? System.IO.Stream.Null);
+            BossImage = Image.FromStream(ResourceLoader.LoadResource(null, "ganyu.png") ?? System.IO.Stream.Null);
             titlefont = new Font(ResourceLoader.LoadFont(Assembly.GetExecutingAssembly(), "menu.ttf") ?? new FontFamily(GenericFontFamilies.Serif), 36);
             sf = new StringFormat
             {
@@ -108,7 +108,7 @@ namespace Genshmup.Game
 
             vectorFields = new Func<Vector2, Vector2>[]
             {
-                Straight,
+                Spiral,
                 Spiral,
                 Target
             };
@@ -173,12 +173,12 @@ namespace Genshmup.Game
                 if (!rendered.MoveNext()) rendered.Reset();
 
                 // Figures
-                g.DrawImage(Kakbrazeus, player.Position);
+                g.DrawImage(PlayerImage, player.Position);
                 if (!dialog && deathprotection != 0)
                 {
                     g.DrawEllipse(new Pen(Color.BlueViolet, 2.0f), player.Rect);
                 }
-                g.DrawImage(Dvalin, boss.Position);
+                g.DrawImage(BossImage, boss.Position);
 
                 // Dialog
                 if (dialog)
@@ -319,8 +319,18 @@ namespace Genshmup.Game
                         }
                         dialogString = "";
                         currentElement = parsedDialog.Current;
-                        while (currentElement.Type == ElementType.Conditional && currentElement.Condition != condition)
+                        while ((currentElement.Type == ElementType.Conditional && currentElement.Condition != condition) || (currentElement.Type == ElementType.HardcodeEvent))
                         {
+                            if (currentElement.Type == ElementType.HardcodeEvent)
+                            {
+                                switch (currentElement.Content)
+                                {
+                                    case "SwBg":
+                                        PlayerImage = Image.FromStream(ResourceLoader.LoadResource(null, "ganyu.png") ?? System.IO.Stream.Null);
+                                        BossImage = Image.FromStream(ResourceLoader.LoadResource(null, "dvalin.png") ?? System.IO.Stream.Null);
+                                        break;
+                                }
+                            }
                             if (!parsedDialog.MoveNext())
                             {
                                 dialog = false;
@@ -515,9 +525,17 @@ namespace Genshmup.Game
 
         private Vector2 Target(Vector2 pos)
         {
-            Vector2 ppos = new(player.Position.X + 16, player.Position.Y + 16);
-            Vector2 bpos = new(boss.Position.X + 16, boss.Position.Y + 16);
-            return pos + new Vector2(0, 1) + (ppos - bpos) / 40;
+            pos -= EpiCenter;
+
+            Polar polar = new(pos.Length(), (float)Math.Atan2(pos.Y, pos.X));
+            polar.radius += 2.2f;
+            if (pos.X < 4 && pos.Y < 4)
+            {
+                Vector2 ppos = new Vector2(player.Position.X + 16, player.Position.Y + 16) - EpiCenter;
+                polar.angle = (float)Math.Atan2(ppos.Y, ppos.X);
+            }
+
+            return EpiCenter + new Vector2(polar.radius * (float)Math.Cos(polar.angle), polar.radius * (float)Math.Sin(polar.angle));
         }
     }
 }

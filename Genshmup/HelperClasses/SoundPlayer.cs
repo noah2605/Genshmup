@@ -73,7 +73,7 @@ namespace Genshmup.HelperClasses
             ap.Init(prv);
             ap.Play();
             audioPlayers.Add((ap, tuple.Item2, tuple.Item3));
-            ap.PlaybackStopped += DeleteAudioPlayer;
+            ap.PlaybackStopped += RenewLoop;
         }
 
         public static void DisposeAll()
