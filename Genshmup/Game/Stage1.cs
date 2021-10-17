@@ -43,7 +43,7 @@ namespace Genshmup.Game
 
         private Point[][] bulletPositionsBoss;
         private readonly Rectangle[] bulletElementsBoss;
-        private Func<Vector2, Vector2>[] vectorFields;
+        private readonly Func<Vector2, Vector2>[] vectorFields;
         private Vector2 EpiCenter;
         private Point destinationBoss;
 
