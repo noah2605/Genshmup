@@ -30,6 +30,8 @@ namespace Genshmup.Game
         {
             "Play",
             "Settings",
+            "Stage Select",
+            "Music Room",
             "Exit"
         };
 
@@ -86,11 +88,11 @@ namespace Genshmup.Game
                     {
                         if (SelectedIndex == i)
                         {
-                            g.DrawString(MenuItems[i], itemfont, Brushes.White, new Point(80, 80 + i * 40), sf);
+                            g.DrawString(MenuItems[i], itemfont, Brushes.White, new Point(120, 80 + i * 40), sf);
                             g.DrawString(MenuItems[i], new Font(itemfont, FontStyle.Bold), 
-                                new SolidBrush(DanmakuGraphics.ColorFromUInt(0x7FFFFFFF)), new Point(80, 80 + i * 40), sf);
+                                new SolidBrush(DanmakuGraphics.ColorFromUInt(0x7FFFFFFF)), new Point(120, 80 + i * 40), sf);
                         }
-                        else g.DrawString(MenuItems[i], itemfont, Brushes.Gray, new Point(80, 80 + i * 40), sf);
+                        else g.DrawString(MenuItems[i], itemfont, Brushes.Gray, new Point(120, 80 + i * 40), sf);
                     }
                 }
                 else
@@ -211,7 +213,7 @@ namespace Genshmup.Game
                                 case 1:
                                     settings = !settings;
                                     break;
-                                case 2:
+                                case 4:
                                     return LogicExit.CloseApplication;
                             }
                         }
