@@ -78,6 +78,12 @@ namespace Genshmup.HelperClasses
 
         public static void DisposeAll()
         {
+            // Avoid Clipping and let audio player finish loading if it hasn't already
+            for (int i = 0; i < audioPlayers.Count; i++)
+            {
+                for (int c = 0; c < audioPlayers[i].Item1.AudioStreamVolume.ChannelCount; c++)
+                    audioPlayers[i].Item1.AudioStreamVolume.SetChannelVolume(c, 0);
+            }
             for (int i = 0; i < audioPlayers.Count; i++)
             {
                 audioPlayers[i].Item1.PlaybackStopped -= RenewLoop;

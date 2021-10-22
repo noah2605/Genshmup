@@ -26,13 +26,21 @@
 
   <ItemGroup>
     <None Remove="Assets\bullets1.png" />
+    <None Remove="Assets\bullets2.png" />
+    <None Remove="Assets\bullets3.png" />
     <None Remove="Assets\Dialog\Ending.dlg" />
     <None Remove="Assets\Dialog\Stage1.dlg" />
     <None Remove="Assets\Dialog\Stage2.dlg" />
     <None Remove="Assets\Dialog\Stage3.dlg" />
+    <None Remove="Assets\dvalin.png" />
     <None Remove="Assets\ganyu.ico" />
+    <None Remove="Assets\heart.png" />
     <None Remove="Assets\kakbrazeus.png" />
+    <None Remove="Assets\sonja.png" />
+    <None Remove="Assets\sonjaboss.png" />
+    <None Remove="Assets\sonjaglow.png" />
     <None Remove="Assets\Sys\BGM\Menu.flac" />
+    <None Remove="Assets\Sys\BGM\st1.flac" />
     <None Remove="Assets\Sys\menu.ttf" />
     <None Remove="Assets\Sys\Sounds\boss_death.wav" />
     <None Remove="Assets\Sys\Sounds\death.wav" />
@@ -52,14 +60,22 @@
 
   <ItemGroup>
     <EmbeddedResource Include="Assets\bullets1.png" />
+    <EmbeddedResource Include="Assets\bullets2.png" />
+    <EmbeddedResource Include="Assets\bullets3.png" />
     <EmbeddedResource Include="Assets\Dialog\Ending.dlg" />
     <EmbeddedResource Include="Assets\Dialog\Stage1.dlg" />
     <EmbeddedResource Include="Assets\Dialog\Stage2.dlg" />
     <EmbeddedResource Include="Assets\Dialog\Stage3.dlg" />
+    <EmbeddedResource Include="Assets\dvalin.png" />
     <EmbeddedResource Include="Assets\ganyu.ico" />
+    <EmbeddedResource Include="Assets\heart.png" />
     <EmbeddedResource Include="Assets\kakbrazeus.png" />
     <EmbeddedResource Include="Assets\ganyu.png" />
+    <EmbeddedResource Include="Assets\sonja.png" />
+    <EmbeddedResource Include="Assets\sonjaboss.png" />
+    <EmbeddedResource Include="Assets\sonjaglow.png" />
     <EmbeddedResource Include="Assets\Sys\BGM\menu.flac" />
+    <EmbeddedResource Include="Assets\Sys\BGM\st1.flac" />
     <EmbeddedResource Include="Assets\Sys\menu.ttf" />
     <EmbeddedResource Include="Assets\Sys\Sounds\boss_death.wav" />
     <EmbeddedResource Include="Assets\Sys\Sounds\death.wav" />

@@ -6,6 +6,7 @@ using Genshmup.HelperClasses;
 using System.Drawing;
 using System.Reflection;
 using System.Drawing.Text;
+using System.Drawing.Drawing2D;
 using System.IO;
 
 namespace Genshmup.Game
@@ -28,6 +29,7 @@ namespace Genshmup.Game
 
         private readonly Image Kakbrazeus;
         private readonly Image Ganyu;
+        private readonly Image Heart;
 
         private readonly Font titlefont;
 
@@ -58,8 +60,10 @@ namespace Genshmup.Game
 
         public Stage1()
         {
-            Kakbrazeus = Image.FromStream(ResourceLoader.LoadResource(null, "kakbrazeus.png") ?? System.IO.Stream.Null);
-            Ganyu = Image.FromStream(ResourceLoader.LoadResource(null, "ganyu.png") ?? System.IO.Stream.Null);
+            Kakbrazeus = Image.FromStream(ResourceLoader.LoadResource(null, "kakbrazeus.png") ?? Stream.Null);
+            Ganyu = Image.FromStream(ResourceLoader.LoadResource(null, "ganyu.png") ?? Stream.Null);
+            Heart = Image.FromStream(ResourceLoader.LoadResource(null, "heart.png") ?? Stream.Null);
+
             titlefont = new Font(ResourceLoader.LoadFont(Assembly.GetExecutingAssembly(), "menu.ttf") ?? new FontFamily(GenericFontFamilies.Serif), 36);
 
             bulletPositions = new Point[3][];
@@ -177,6 +181,11 @@ namespace Genshmup.Game
                     g.DrawEllipse(new Pen(Color.BlueViolet, 2.0f), player.Rect);
                 }
                 g.DrawImage(Ganyu, boss.Position);
+                if (shifting)
+                {
+                    g.FillEllipse(Brushes.DarkRed, new Rectangle(player.Hitbox.X - 3, player.Hitbox.Y - 3, player.Hitbox.Width + 6, player.Hitbox.Height + 6));
+                    g.FillEllipse(Brushes.Red, player.Hitbox);
+                }
 
                 // Dialog
                 if (dialog)
@@ -220,6 +229,13 @@ namespace Genshmup.Game
                 DanmakuGraphics.RenderAtlas(g, bulletAtlas, bulletElementsBoss, bulletPositionsBoss);
 
                 // Health Bars and other Info
+                for (int i = 0; i < Math.Min(player.Lives, 3); i++) g.DrawImage(Heart, new Point(475 - 16 * (i + 1), 5));
+
+                g.DrawString("Ganyu", new Font(titlefont.FontFamily, 11, FontStyle.Regular), Brushes.White, new Point(5, 5));
+                g.DrawRectangle(Pens.White, new Rectangle(55, 5, 360, 20));
+                g.FillRectangle(new LinearGradientBrush(new Rectangle(0, 0, 480, 20), Color.Turquoise, Color.DarkBlue, LinearGradientMode.ForwardDiagonal), new Rectangle(56, 6, (int)(boss.Health * 358.0 / 10000.0), 18));
+
+
 
                 // Warning sign when phase changes
 
@@ -320,8 +336,17 @@ namespace Genshmup.Game
                         }
                         dialogString = "";
                         currentElement = parsedDialog.Current;
-                        while (currentElement.Type == ElementType.Conditional && currentElement.Condition != condition)
+                        while ((currentElement.Type == ElementType.Conditional && currentElement.Condition != condition) || (currentElement.Type == ElementType.HardcodeEvent))
                         {
+                            if (currentElement.Type == ElementType.HardcodeEvent)
+                            {
+                                switch (currentElement.Content)
+                                {
+                                    case "StBgm":
+                                        SoundPlayer.PlaySoundLoop("st1.flac");
+                                        break;
+                                }
+                            }
                             if (!parsedDialog.MoveNext())
                             {
                                 dialog = false;
@@ -334,6 +359,8 @@ namespace Genshmup.Game
                     if (events.Contains("S"))
                     {
                         SoundPlayer.PlaySound("enter.wav", true);
+                        SoundPlayer.DisposeAll();
+                        SoundPlayer.PlaySoundLoop("st1.flac");
                         dialog = false;
                         return LogicExit.Nothing;
                     }
