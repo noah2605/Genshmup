@@ -27,26 +27,22 @@ namespace Genshmup.HelperClasses
         {
             WasapiOut ap = new();
             StreamMediaFoundationReader reader = new(ResourceLoader.LoadResource(null, name));
-            VolumeSampleProvider prv = new(reader.ToSampleProvider());
-            prv.Volume = sfx ? _sfxvolume : _volume;
-            ap.Init(prv);
+            ap.Init(reader);
             ap.Play();
             audioPlayers.Add((ap, name, sfx));
             ap.PlaybackStopped += DeleteAudioPlayer;
+            ChangeVolume(sfx ? _sfxvolume : _volume, sfx);
         }
 
         public static void PlaySoundLoop(string name)
         {
             WasapiOut ap = new();
             StreamMediaFoundationReader reader = new(ResourceLoader.LoadResource(null, name));
-            VolumeSampleProvider prv = new(reader.ToSampleProvider())
-            {
-                Volume = _volume
-            };
-            ap.Init(prv);
+            ap.Init(reader);
             ap.Play();
             audioPlayers.Add((ap, name, false));
             ap.PlaybackStopped += RenewLoop;
+            ChangeVolume(_volume, false);
         }
 
         private static void ChangeVolume(float vol, bool sfx)
@@ -68,12 +64,11 @@ namespace Genshmup.HelperClasses
             audioPlayers.Remove(tuple);
             StreamMediaFoundationReader reader = new(ResourceLoader.LoadResource(null, tuple.Item2));
             ap = new WasapiOut();
-            VolumeSampleProvider prv = new(reader.ToSampleProvider());
-            prv.Volume = _volume;
-            ap.Init(prv);
+            ap.Init(reader);
             ap.Play();
             audioPlayers.Add((ap, tuple.Item2, tuple.Item3));
             ap.PlaybackStopped += RenewLoop;
+            ChangeVolume(_volume, false);
         }
 
         public static void DisposeAll()

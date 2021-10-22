@@ -235,7 +235,33 @@ namespace Genshmup.Game
                 g.DrawRectangle(Pens.White, new Rectangle(55, 5, 360, 20));
                 g.FillRectangle(new LinearGradientBrush(new Rectangle(0, 0, 480, 20), Color.Turquoise, Color.DarkBlue, LinearGradientMode.ForwardDiagonal), new Rectangle(56, 6, (int)(boss.Health * 358.0 / 10000.0), 18));
 
+                g.DrawEllipse(new Pen(Color.White, 1f), new Rectangle(475 - 64, 355 - 64, 64, 64));
+                g.DrawEllipse(new Pen(Color.White, 1f), new Rectangle(475 - 48 - 5 - 64, 355 - 48, 48, 48));
 
+                // behold
+                int sheight = (int)(_bulletCooldowns[2] * 64.0 / 1200.0);
+                // the genius way to draw cropped cirlc
+                // first we declare a Bitmap as buffer
+                Bitmap b = new(64, 64);
+                Graphics bg = Graphics.FromImage(b);
+                // then we draw the circle
+                bg.FillEllipse(new LinearGradientBrush(new Rectangle(0, 0, 64, 64), Color.White, Color.DarkBlue, LinearGradientMode.ForwardDiagonal), new Rectangle(0, 0, 64, 64));
+                // then we draw the erasing rectangle
+                bg.FillRectangle(Brushes.Green, new Rectangle(0, 0, 64, 64 - sheight));
+                b.MakeTransparent(Color.Green);
+                // then we draw the image onto the main
+                g.DrawImage(b, 475 - 64, 355 - 64);
+
+                sheight = (int)(_bulletCooldowns[1] * 48.0 / 600.0);
+                b = new(48, 48);
+                bg = Graphics.FromImage(b);
+                bg.FillEllipse(new LinearGradientBrush(new Rectangle(0, 0, 48, 48), Color.DarkBlue, Color.Teal, LinearGradientMode.ForwardDiagonal), new Rectangle(0, 0, 48, 48));
+                bg.FillRectangle(Brushes.Green, new Rectangle(0, 0, 48, 48 - sheight));
+                b.MakeTransparent(Color.Green);
+                g.DrawImage(b, 475 - 48 - 5 - 64, 355 - 48);
+
+                g.DrawString("E", titlefont, Brushes.White, new Rectangle(475 - 48 - 5 - 64, 355 - 48, 48, 48), new StringFormat { Alignment = StringAlignment.Center, LineAlignment = StringAlignment.Center });
+                g.DrawString("Q", titlefont, Brushes.White, new Rectangle(475 - 64, 355 - 64, 64, 64), new StringFormat { Alignment = StringAlignment.Center, LineAlignment = StringAlignment.Center });
 
                 // Warning sign when phase changes
 
@@ -396,8 +422,6 @@ namespace Genshmup.Game
                             keysleep = 20;
                             break;
                         case "Enter":
-                        case "Z":
-                        case "Y":
                             _nextScreen = selectedIndex == 0 ? 1 : 0;
                             return LogicExit.ScreenChange;
                     }

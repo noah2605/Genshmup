@@ -40,6 +40,8 @@ namespace Genshmup
             g = CreateGraphics();
             buffer = BufferedGraphicsManager.Current.Allocate(g, ClientRectangle);
 
+            g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
+            buffer.Graphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
             t = new Thread(new ThreadStart(Render));
         }
 
