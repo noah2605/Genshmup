@@ -41,16 +41,21 @@
     <None Remove="Assets\sonjaglow.png" />
     <None Remove="Assets\Sys\BGM\Menu.flac" />
     <None Remove="Assets\Sys\BGM\st1.flac" />
+    <None Remove="Assets\Sys\BGM\st2.flac" />
     <None Remove="Assets\Sys\menu.ttf" />
     <None Remove="Assets\Sys\Sounds\boss_death.wav" />
     <None Remove="Assets\Sys\Sounds\death.wav" />
     <None Remove="Assets\Sys\Sounds\elem_1.wav" />
+    <None Remove="Assets\Sys\Sounds\elem_2.wav" />
+    <None Remove="Assets\Sys\Sounds\elem_3.wav" />
     <None Remove="Assets\Sys\Sounds\enter.wav" />
     <None Remove="Assets\Sys\Sounds\select.wav" />
     <None Remove="Assets\Sys\Sounds\shot.wav" />
     <None Remove="Assets\Sys\Sounds\stage_failed.wav" />
     <None Remove="Assets\Sys\Sounds\stage_intro.wav" />
     <None Remove="Assets\Sys\Sounds\ult_1.wav" />
+    <None Remove="Assets\Sys\Sounds\ult_2.wav" />
+    <None Remove="Assets\Sys\Sounds\ult_3.wav" />
     <None Remove="Assets\Sys\Splash.png" />
   </ItemGroup>
 
@@ -76,16 +81,21 @@
     <EmbeddedResource Include="Assets\sonjaglow.png" />
     <EmbeddedResource Include="Assets\Sys\BGM\menu.flac" />
     <EmbeddedResource Include="Assets\Sys\BGM\st1.flac" />
+    <EmbeddedResource Include="Assets\Sys\BGM\st2.flac" />
     <EmbeddedResource Include="Assets\Sys\menu.ttf" />
     <EmbeddedResource Include="Assets\Sys\Sounds\boss_death.wav" />
     <EmbeddedResource Include="Assets\Sys\Sounds\death.wav" />
     <EmbeddedResource Include="Assets\Sys\Sounds\elem_1.wav" />
+    <EmbeddedResource Include="Assets\Sys\Sounds\elem_2.wav" />
+    <EmbeddedResource Include="Assets\Sys\Sounds\elem_3.wav" />
     <EmbeddedResource Include="Assets\Sys\Sounds\enter.wav" />
     <EmbeddedResource Include="Assets\Sys\Sounds\select.wav" />
     <EmbeddedResource Include="Assets\Sys\Sounds\shot.wav" />
     <EmbeddedResource Include="Assets\Sys\Sounds\stage_failed.wav" />
     <EmbeddedResource Include="Assets\Sys\Sounds\stage_intro.wav" />
     <EmbeddedResource Include="Assets\Sys\Sounds\ult_1.wav" />
+    <EmbeddedResource Include="Assets\Sys\Sounds\ult_2.wav" />
+    <EmbeddedResource Include="Assets\Sys\Sounds\ult_3.wav" />
   </ItemGroup>
 
   <ItemGroup>

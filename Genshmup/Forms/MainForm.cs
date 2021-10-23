@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
 using Genshmup.HelperClasses;
@@ -20,8 +19,6 @@ namespace Genshmup
 
         private readonly List<string> eventBuffer = new();
 
-        private Thread t;
-
         public MainForm()
         {
             InitializeComponent();
@@ -34,7 +31,9 @@ namespace Genshmup
                 new Stage1(),
                 new Stage2(),
                 new Stage3(),
-                new Credits()
+                new Credits(),
+                new MusicRoom(),
+                new StageSelect()
             };
 
             g = CreateGraphics();
@@ -42,7 +41,6 @@ namespace Genshmup
 
             g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
             buffer.Graphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
-            t = new Thread(new ThreadStart(Render));
         }
 
         private void MainForm_Load(object sender, EventArgs e)
@@ -77,7 +75,9 @@ namespace Genshmup
                     new Stage1(),
                     new Stage2(),
                     new Stage3(),
-                    new Credits()
+                    new Credits(),
+                    new MusicRoom(),
+                    new StageSelect()
                 };
                 phase = Math.Max(0, Math.Min(nextScreen, screens.Length));
                 screens[phase].Init();

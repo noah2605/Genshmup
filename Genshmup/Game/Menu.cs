@@ -18,6 +18,8 @@ namespace Genshmup.Game
 
         private bool settings;
 
+        private int configf = 0;
+
         private readonly Font itemfont;
         private readonly Font titlefont;
         private readonly StringFormat sf;
@@ -30,8 +32,8 @@ namespace Genshmup.Game
         {
             "Play",
             "Settings",
-            "Stage Select",
             "Music Room",
+            "Stage Select",
             "Exit"
         };
 
@@ -61,6 +63,7 @@ namespace Genshmup.Game
         }
         public override void Init()
         {
+            configf = System.IO.File.Exists("./g.dat") ? BitConverter.ToInt32(System.IO.File.ReadAllBytes("./g.dat")) : 0;
             SoundPlayer.PlaySoundLoop("menu.flac");
             for (int i = 0; i < 30; i++)
                 renderedList.Add(GenerateNoise());
@@ -170,7 +173,6 @@ namespace Genshmup.Game
 
             return bmp;
         }
-
         public override LogicExit Logic(string[] events)
         {
             foreach (string eventName in events)
@@ -212,6 +214,16 @@ namespace Genshmup.Game
                                     return LogicExit.ScreenChange;
                                 case 1:
                                     settings = !settings;
+                                    break;
+                                case 2:
+                                    _nextScreen = 5;
+                                    return LogicExit.ScreenChange;
+                                case 3:
+                                    if ((configf & 1) == 1)
+                                    {
+                                        _nextScreen = 6;
+                                        return LogicExit.ScreenChange;
+                                    }
                                     break;
                                 case 4:
                                     return LogicExit.CloseApplication;

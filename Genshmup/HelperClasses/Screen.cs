@@ -28,7 +28,7 @@ namespace Genshmup.HelperClasses
             foreach (string ev in events)
             switch (ev)
             {
-                case "Escape":
+                case "F4":
                     SoundPlayer.PlaySound("enter.wav", true);
                     return LogicExit.CloseApplication;
             }
