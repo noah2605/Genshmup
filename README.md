@@ -2,7 +2,7 @@
 
 A Genshin Themed Danmaku Shooter written in C# .NET 6 using GDI+
 
-![Ganmyu](./Assets/ganyu.png)
+![Ganmyu](./Genshmup/Assets/ganyu.png)
 
 ## Controls
 ### Stage
