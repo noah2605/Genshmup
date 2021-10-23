@@ -81,6 +81,7 @@ namespace Genshmup.HelperClasses
             }
             for (int i = 0; i < audioPlayers.Count; i++)
             {
+                if (audioPlayers[i].Item3 == true) continue; // SFX can play out
                 audioPlayers[i].Item1.PlaybackStopped -= RenewLoop;
                 audioPlayers[i].Item1.PlaybackStopped -= DeleteAudioPlayer;
                 audioPlayers[i].Item1.Stop();
