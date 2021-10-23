@@ -12,7 +12,8 @@ A Genshin Themed Danmaku Shooter written in C# .NET 6 using GDI+
 **E** - Use Elemental Skill  
 **Q** - Use Ultimate Skill  
 **Shift** - Move slower and show Hitbox  
-**Escape** - Pause
+**Escape** - Pause  
+**S** - Skip Dialog
 
 ### Menus
 
