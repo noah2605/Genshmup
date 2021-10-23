@@ -1,20 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Genshmup.HelperClasses
 {
     public class Dialog : IEnumerator<DialogElement>, IEnumerable<DialogElement>
     {
         object IEnumerator.Current => Current;
-        public DialogElement Current { get => _current; }
+        public DialogElement Current => _current;
 
         private int position;
 
-        private DialogElement[] elements;
+        private readonly DialogElement[] elements;
+
+        public static Dialog Empty => FromArray(Array.Empty<DialogElement>());
 
         public bool MoveNext()
         {
@@ -32,7 +31,10 @@ namespace Genshmup.HelperClasses
         {
             return this;
         }
-        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
+        }
 
         private Dialog(DialogElement[] elements)
         {

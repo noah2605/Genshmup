@@ -15,7 +15,7 @@ namespace Genshmup
 
         private int phase = 0;
 
-        private HelperClasses.Screen[] screens = new HelperClasses.Screen[5];
+        private HelperClasses.Screen[] screens = new HelperClasses.Screen[7];
 
         private readonly List<string> eventBuffer = new();
 
@@ -121,6 +121,11 @@ namespace Genshmup
             {
                 s.Dispose();
             }
+        }
+
+        private void MainForm_HelpButtonClicked(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            System.Diagnostics.Process.Start("explorer", "https://github.com/noah2605/Genshmup/blob/master/README.md");
         }
     }
 }

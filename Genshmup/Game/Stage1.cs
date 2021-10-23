@@ -13,93 +13,27 @@ namespace Genshmup.Game
 {
     public class Stage1 : Stage
     {
-        private int keysleep = 20;
-        private int protection = 60;
-        private int shieldType = 0;
-
-        private readonly Player player = new();
-        private readonly Boss boss = new();
-
-        private readonly List<Image> renderedList;
-        private IEnumerator<Image> rendered;
-        readonly Point[] noisePoints = new Point[8];
-
-        private readonly int movementSpeed = 10;
-        private readonly int movementSpeedShifting = 2;
-        private bool shifting = false;
-
         private readonly Image Kakbrazeus;
         private readonly Image Ganyu;
-        private readonly Image Heart;
 
         private readonly Font titlefont;
 
-        private Rectangle CR;
 
-        private Point[][] bulletPositions;
-        private readonly Image bulletAtlas;
-        private readonly Rectangle[] bulletElements;
-
-        private readonly int[] bulletSpeeds;
-        private readonly int[] bulletDamages;
-        private readonly int[] bulletCooldowns;
-        private int elementalEnergy = 0;
-        private int[] _bulletCooldowns;
-
-        private Point[][] bulletPositionsBoss;
-        private readonly Rectangle[] bulletElementsBoss;
-        private readonly Func<Vector2, Vector2>[] vectorFields;
+        private Func<Vector2, Vector2>[] vectorFields;
         private Vector2 EpiCenter;
-        private Point destinationBoss;
 
-        private bool gameover = false;
-        private bool dialog = true;
-        private bool paused = false;
-        private int selectedIndex = 0;
-
-        private string dialogString = "";
-        private readonly Dialog parsedDialog;
-        private DialogElement currentElement = new(ElementType.TextLine, "", "");
-        private int condition = 0;
-
-        public Stage1()
+        public Stage1() : base()
         {
             Kakbrazeus = Image.FromStream(ResourceLoader.LoadResource(null, "kakbrazeus.png") ?? Stream.Null);
             Ganyu = Image.FromStream(ResourceLoader.LoadResource(null, "ganyu.png") ?? Stream.Null);
-            Heart = Image.FromStream(ResourceLoader.LoadResource(null, "heart.png") ?? Stream.Null);
 
             titlefont = new Font(ResourceLoader.LoadFont(Assembly.GetExecutingAssembly(), "menu.ttf") ?? new FontFamily(GenericFontFamilies.Serif), 24);
-
-            bulletPositions = new Point[3][];
-            for (int i = 0; i < bulletPositions.Length; i++)
-                bulletPositions[i] = Array.Empty<Point>();
-            bulletPositionsBoss = new Point[3][];
-            for (int i = 0; i < bulletPositionsBoss.Length; i++)
-                bulletPositionsBoss[i] = Array.Empty<Point>();
-            bulletElements = new Rectangle[] {
-                new Rectangle(0, 0, 32, 32),
-                new Rectangle(32, 0, 32, 32),
-                new Rectangle(64, 0, 32, 32)
-            };
-
-            bulletElementsBoss = new Rectangle[] {
-                new Rectangle(0, 32, 32, 32),
-                new Rectangle(32, 32, 32, 32),
-                new Rectangle(64, 32, 32, 32)
-            };
-
             bulletAtlas = Image.FromStream(ResourceLoader.LoadResource(null, "bullets1.png") ?? Stream.Null);
+
             bulletSpeeds = new int[] { 20, 10, 5 };
             bulletDamages = new int[] { 2, 600, 1200 };
             bulletCooldowns = new int[] { 5, 600, 1200 };
-            _bulletCooldowns = new int[3];
-            Array.Fill(_bulletCooldowns, 300);
-            CR = new Rectangle(0, 0, 480, 360);
 
-            renderedList = new();
-            rendered = renderedList.GetEnumerator();
-
-            player.Lives = 3;
             parsedDialog = DialogParser.Parse(new StreamReader(ResourceLoader.LoadResource(null, "Stage1.dlg") ?? Stream.Null).ReadToEnd());
 
             vectorFields = new Func<Vector2, Vector2>[]
@@ -108,13 +42,11 @@ namespace Genshmup.Game
                 Straight,
                 Target
             };
-            EpiCenter = new Vector2(0);
         }
 
         public override void Init()
         {
-            SoundPlayer.PlaySound("stage_intro.wav", true);
-
+            base.Init();
             boss.Position = new Point(224, 40);
             boss.Health = 10000;
             for (int i = 0; i < 30; i++)
@@ -202,20 +134,20 @@ namespace Genshmup.Game
                 if (dialog)
                 {
                     g.FillRectangle(new SolidBrush(DanmakuGraphics.ColorFromUInt(0xA0000000)), new Rectangle(5, 205, 150, 35));
-                    g.DrawString(currentElement.Author, 
+                    g.DrawString(currentElement.Author,
                         new Font(titlefont.FontFamily, 16, FontStyle.Regular), Brushes.White, new Point(20, 210));
 
                     g.FillRectangle(new SolidBrush(DanmakuGraphics.ColorFromUInt(0xA0000000)), new Rectangle(5, 245, 470, 110));
                     if (currentElement.Type == ElementType.TextLine || currentElement.Type == ElementType.Conditional)
-                        g.DrawString(dialogString, new Font(titlefont.FontFamily, 16, FontStyle.Regular), 
-                            Brushes.White, new Rectangle(20, 260, 440, 90), 
+                        g.DrawString(dialogString, new Font(titlefont.FontFamily, 16, FontStyle.Regular),
+                            Brushes.White, new Rectangle(20, 260, 440, 90),
                             new StringFormat() { Trimming = StringTrimming.EllipsisWord });
                     else if (currentElement.Type == ElementType.BigTextLine)
                         g.DrawString(dialogString, new Font(titlefont.FontFamily, 72, FontStyle.Bold), Brushes.White, new Point(20, 260));
                     else if (currentElement.Type == ElementType.Prompt)
                     {
-                        g.DrawString(dialogString, new Font(titlefont.FontFamily, 16, FontStyle.Regular), 
-                            Brushes.White, new Rectangle(20, 260, 440, 90), 
+                        g.DrawString(dialogString, new Font(titlefont.FontFamily, 16, FontStyle.Regular),
+                            Brushes.White, new Rectangle(20, 260, 440, 90),
                             new StringFormat() { Trimming = StringTrimming.EllipsisWord });
                         for (int i = 0; i < (currentElement.Choices == null ? 0 : currentElement.Choices.Length); i++)
                         {
@@ -246,8 +178,8 @@ namespace Genshmup.Game
                 g.DrawRectangle(Pens.White, new Rectangle(55, 5, 360, 20));
                 g.FillRectangle(new LinearGradientBrush(new Rectangle(0, 0, 480, 20), Color.Turquoise, Color.DarkBlue, LinearGradientMode.ForwardDiagonal), new Rectangle(56, 6, (int)(boss.Health * 358.0 / 10000.0), 18));
 
-                g.DrawEllipse(new Pen(Color.White, 1f), new Rectangle(475 - 64, 355 - 64, 64, 64));
-                g.DrawEllipse(new Pen(Color.White, 1f), new Rectangle(475 - 48 - 5 - 64, 355 - 48, 48, 48));
+                g.DrawEllipse(new Pen(Color.White, _bulletCooldowns[2] == bulletCooldowns[2] ? 8f : 1f), new Rectangle(475 - 64, 355 - 64, 64, 64));
+                g.DrawEllipse(new Pen(Color.White, _bulletCooldowns[1] == bulletCooldowns[1] ? 8f : 1f), new Rectangle(475 - 48 - 5 - 64, 355 - 48, 48, 48));
 
                 // behold
                 int sheight = (int)(_bulletCooldowns[2] * 64.0 / 1200.0);
@@ -256,7 +188,7 @@ namespace Genshmup.Game
                 Bitmap b = new(64, 64);
                 Graphics bg = Graphics.FromImage(b);
                 // then we draw the circle
-                bg.FillEllipse(new LinearGradientBrush(new Rectangle(0, 0, 64, 64), Color.White, Color.DarkBlue, 
+                bg.FillEllipse(new LinearGradientBrush(new Rectangle(0, 0, 64, 64), Color.White, Color.DarkBlue,
                     LinearGradientMode.ForwardDiagonal), new Rectangle(0, 0, 64, 64));
                 // then we draw the erasing rectangle
                 bg.FillRectangle(Brushes.Green, new Rectangle(0, 0, 64, 64 - sheight));
@@ -603,7 +535,8 @@ namespace Genshmup.Game
                 if (_bulletCooldowns[t] < bulletCooldowns[t])
                 {
                     _bulletCooldowns[t]++;
-                    if (_bulletCooldowns[t] == bulletCooldowns[t]) { 
+                    if (_bulletCooldowns[t] == bulletCooldowns[t])
+                    {
                         if (t == 1) SoundPlayer.PlaySound("elem_3.wav", true);
                         if (t == 2) SoundPlayer.PlaySound("ult_3.wav", true);
                     }
