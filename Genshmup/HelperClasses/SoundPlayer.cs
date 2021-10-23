@@ -12,13 +12,13 @@ namespace Genshmup.HelperClasses
         private static float _sfxvolume = 1.0f;
         public static float Volume
         {
-            get { return _volume; }
-            set { ChangeVolume(value, false); }
+            get => _volume;
+            set => ChangeVolume(value, false);
         }
         public static float SFXVolume
         {
-            get { return _sfxvolume; }
-            set { ChangeVolume(value, true); }
+            get => _sfxvolume;
+            set => ChangeVolume(value, true);
         }
 
         private static readonly List<(WasapiOut, string, bool)> audioPlayers = new();
@@ -76,12 +76,13 @@ namespace Genshmup.HelperClasses
             // Avoid Clipping and let audio player finish loading if it hasn't already
             for (int i = 0; i < audioPlayers.Count; i++)
             {
+                if (audioPlayers[i].Item3) continue;
                 for (int c = 0; c < audioPlayers[i].Item1.AudioStreamVolume.ChannelCount; c++)
                     audioPlayers[i].Item1.AudioStreamVolume.SetChannelVolume(c, 0);
             }
             for (int i = 0; i < audioPlayers.Count; i++)
             {
-                if (audioPlayers[i].Item3 == true) continue; // SFX can play out
+                if (audioPlayers[i].Item3) continue; // SFX can play out
                 audioPlayers[i].Item1.PlaybackStopped -= RenewLoop;
                 audioPlayers[i].Item1.PlaybackStopped -= DeleteAudioPlayer;
                 audioPlayers[i].Item1.Stop();

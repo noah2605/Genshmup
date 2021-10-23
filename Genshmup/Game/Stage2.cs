@@ -13,115 +13,50 @@ namespace Genshmup.Game
 {
     public class Stage2 : Stage
     {
-        private int keysleep = 20;
-        private int protection = 60;
-        private int shieldType = 0;
-
-        private readonly Player player = new();
-        private readonly Boss boss = new();
-
-        private readonly List<Image> renderedList;
-        private IEnumerator<Image> rendered;
-        readonly Point[] noisePoints = new Point[8];
-
-        private readonly int movementSpeed = 10;
-        private readonly int movementSpeedShifting = 2;
-        private bool shifting = false;
-
         private Image Ganyu;
         private Image Dvalin;
-        private readonly Image Heart;
 
         private readonly Font titlefont;
 
-        private Rectangle CR;
+        private SubBullet[] subBullets;
 
-        private Point[][] bulletPositions;
-        private readonly Image bulletAtlas;
-        private readonly Rectangle[] bulletElements;
+        private int pulse = 0;
+        private int pulseskip = 3;
 
-        private readonly int[] bulletSpeeds;
-        private readonly int[] bulletDamages;
-        private readonly int[] bulletCooldowns;
-        private int elementalEnergy = 0;
-        private int[] _bulletCooldowns;
+        private Func<Vector2, Vector2>[] vectorFields;
 
-        private Point[][] bulletPositionsBoss;
-        private readonly Rectangle[] bulletElementsBoss;
-        private readonly Func<Vector2, Vector2>[] vectorFields;
-        private Vector2 EpiCenter;
-        private Point destinationBoss;
-
-        private bool gameover = false;
-        private bool dialog = true;
-        private bool paused = false;
-        private int selectedIndex = 0;
-
-        private string dialogString = "";
-        private readonly Dialog parsedDialog;
-        private DialogElement currentElement = new(ElementType.TextLine, "", "");
-        private int condition = 0;
-
-        public Stage2()
+        public Stage2() : base()
         {
             Ganyu = Image.FromStream(ResourceLoader.LoadResource(null, "kakbrazeus.png") ?? Stream.Null);
             Dvalin = Image.FromStream(ResourceLoader.LoadResource(null, "ganyu.png") ?? Stream.Null);
-            Heart = Image.FromStream(ResourceLoader.LoadResource(null, "heart.png") ?? Stream.Null);
 
             titlefont = new Font(ResourceLoader.LoadFont(Assembly.GetExecutingAssembly(), "menu.ttf") ?? new FontFamily(GenericFontFamilies.Serif), 24);
-
-            bulletPositions = new Point[3][];
-            for (int i = 0; i < bulletPositions.Length; i++)
-                bulletPositions[i] = Array.Empty<Point>();
-            bulletPositionsBoss = new Point[3][];
-            for (int i = 0; i < bulletPositionsBoss.Length; i++)
-                bulletPositionsBoss[i] = Array.Empty<Point>();
-            bulletElements = new Rectangle[] {
-                new Rectangle(0, 0, 32, 32),
-                new Rectangle(32, 0, 32, 32),
-                new Rectangle(64, 0, 32, 32)
-            };
-
-            bulletElementsBoss = new Rectangle[] {
-                new Rectangle(0, 32, 32, 32),
-                new Rectangle(32, 32, 32, 32),
-                new Rectangle(64, 32, 32, 32)
-            };
-
             bulletAtlas = Image.FromStream(ResourceLoader.LoadResource(null, "bullets2.png") ?? Stream.Null);
+
             bulletSpeeds = new int[] { 20, 10, 5 };
-            bulletDamages = new int[] { 2, 600, 1200 };
+            bulletDamages = new int[] { 30, 300, 4000 };
             bulletCooldowns = new int[] { 5, 600, 1200 };
-            _bulletCooldowns = new int[3];
-            Array.Fill(_bulletCooldowns, 300);
-            CR = new Rectangle(0, 0, 480, 360);
 
-            renderedList = new();
-            rendered = renderedList.GetEnumerator();
-
-            player.Lives = 3;
             parsedDialog = DialogParser.Parse(new StreamReader(ResourceLoader.LoadResource(null, "Stage2.dlg") ?? Stream.Null).ReadToEnd());
 
             vectorFields = new Func<Vector2, Vector2>[]
             {
-                Spiral,
-                Straight,
-                Target
+                TightSpiral,
+                SineDown,
+                Spread
             };
-            EpiCenter = new Vector2(0);
+
+            subBullets = Array.Empty<SubBullet>();
         }
 
         public override void Init()
         {
-            SoundPlayer.PlaySound("stage_intro.wav", true);
-
+            base.Init();
             boss.Position = new Point(224, 40);
-            boss.Health = 10000;
+            boss.Health = 25000;
             for (int i = 0; i < 30; i++)
                 renderedList.Add(GenerateNoise());
             rendered = renderedList.GetEnumerator();
-
-            EpiCenter = new Vector2(boss.Position.X, 0);
             destinationBoss = boss.Position;
         }
 
@@ -131,7 +66,6 @@ namespace Genshmup.Game
             int maxY = 100;
             Bitmap bmp = new(maxX, maxY);
             Random rng = new(DateTime.Now.Millisecond);
-
 
             if (Point.Empty.Equals(noisePoints[0]))
                 for (int i = 0; i < noisePoints.Length; i++)
@@ -235,15 +169,18 @@ namespace Genshmup.Game
 
                 DanmakuGraphics.RenderAtlas(g, bulletAtlas, bulletElementsBoss, bulletPositionsBoss);
 
+                for (int i = 0; i < subBullets.Length; i++) g.DrawImage(bulletAtlas, new Rectangle(subBullets[i].Position, new Size(16, 16)), bulletElementsBoss[1], GraphicsUnit.Pixel);
+
                 // Health Bars and other Info
                 for (int i = 0; i < Math.Min(player.Lives, 3); i++) g.DrawImage(Heart, new Point(475 - 16 * (i + 1), 5));
 
                 g.DrawString("Dvalin", new Font(titlefont.FontFamily, 11, FontStyle.Regular), Brushes.White, new Point(5, 5));
                 g.DrawRectangle(Pens.White, new Rectangle(55, 5, 360, 20));
-                g.FillRectangle(new LinearGradientBrush(new Rectangle(0, 0, 480, 20), Color.Turquoise, Color.DarkBlue, LinearGradientMode.ForwardDiagonal), new Rectangle(56, 6, (int)(boss.Health * 358.0 / 10000.0), 18));
+                g.FillRectangle(new LinearGradientBrush(new Rectangle(0, 0, 480, 20), Color.DarkBlue, Color.Teal, LinearGradientMode.ForwardDiagonal),
+                    new Rectangle(56, 6, (int)(boss.Health * 358.0 / 25000.0), 18));
 
-                g.DrawEllipse(new Pen(Color.White, 1f), new Rectangle(475 - 64, 355 - 64, 64, 64));
-                g.DrawEllipse(new Pen(Color.White, 1f), new Rectangle(475 - 48 - 5 - 64, 355 - 48, 48, 48));
+                g.DrawEllipse(new Pen(Color.White, _bulletCooldowns[2] == bulletCooldowns[2] ? 8f : 1f), new Rectangle(475 - 64, 355 - 64, 64, 64));
+                g.DrawEllipse(new Pen(Color.White, _bulletCooldowns[1] == bulletCooldowns[1] ? 8f : 1f), new Rectangle(475 - 48 - 5 - 64, 355 - 48, 48, 48));
 
                 // behold
                 int sheight = (int)(_bulletCooldowns[2] * 64.0 / 1200.0);
@@ -252,7 +189,7 @@ namespace Genshmup.Game
                 Bitmap b = new(64, 64);
                 Graphics bg = Graphics.FromImage(b);
                 // then we draw the circle
-                bg.FillEllipse(new LinearGradientBrush(new Rectangle(0, 0, 64, 64), Color.White, Color.DarkBlue,
+                bg.FillEllipse(new LinearGradientBrush(new Rectangle(0, 0, 64, 64), Color.White, Color.BlueViolet,
                     LinearGradientMode.ForwardDiagonal), new Rectangle(0, 0, 64, 64));
                 // then we draw the erasing rectangle
                 bg.FillRectangle(Brushes.Green, new Rectangle(0, 0, 64, 64 - sheight));
@@ -263,7 +200,7 @@ namespace Genshmup.Game
                 sheight = (int)(_bulletCooldowns[1] * 48.0 / 600.0);
                 b = new(48, 48);
                 bg = Graphics.FromImage(b);
-                bg.FillEllipse(new LinearGradientBrush(new Rectangle(0, 0, 48, 48), Color.DarkBlue, Color.Teal,
+                bg.FillEllipse(new LinearGradientBrush(new Rectangle(0, 0, 48, 48), Color.CadetBlue, Color.Teal,
                     LinearGradientMode.ForwardDiagonal), new Rectangle(0, 0, 48, 48));
                 bg.FillRectangle(Brushes.Green, new Rectangle(0, 0, 48, 48 - sheight));
                 b.MakeTransparent(Color.Green);
@@ -333,10 +270,10 @@ namespace Genshmup.Game
             }
         }
 
-        private void BossShoot(int type)
+        private void BossShoot(int type, Point p)
         {
             List<Point> pres = bulletPositionsBoss[type].ToList();
-            pres.Add(new Point(boss.Position.X, boss.Position.Y));
+            pres.Add(p);
             bulletPositionsBoss[type] = pres.ToArray();
         }
 
@@ -466,7 +403,7 @@ namespace Genshmup.Game
                             break;
                         case "Enter":
                             SoundPlayer.PlaySound("enter.wav", true);
-                            _nextScreen = selectedIndex == 0 ? 1 : 0;
+                            _nextScreen = selectedIndex == 0 ? 2 : 0;
                             return LogicExit.ScreenChange;
                     }
                 }
@@ -496,7 +433,7 @@ namespace Genshmup.Game
                                 paused = false;
                             else if (selectedIndex == 1)
                             {
-                                _nextScreen = 1;
+                                _nextScreen = 2;
                                 return LogicExit.ScreenChange;
                             }
                             else if (selectedIndex == 2)
@@ -513,6 +450,7 @@ namespace Genshmup.Game
             }
 
             // Check for Player Collisions
+            bool sbreak = false;
             for (int i1 = 0; i1 < bulletPositionsBoss.Length; i1++)
             {
                 Point[] pa = bulletPositionsBoss[i1];
@@ -540,10 +478,38 @@ namespace Genshmup.Game
                         player.Lives--;
                         shieldType = 1;
                         protection = 60;
-                        return LogicExit.Nothing;
+                        sbreak = true;
+                        break;
                     }
                 }
+                if (sbreak) break;
             }
+            if (!sbreak)
+                for (int i = 0; i < subBullets.Length; i++)
+                {
+                    Point ta = subBullets[i].Position;
+                    Rectangle t = new(ta, new Size(16, 16));
+                    if (player.Hitbox.IntersectsWith(t))
+                    {
+                        List<SubBullet> bpb = subBullets.ToList();
+                        bpb.Remove(subBullets[i]);
+                        subBullets = bpb.ToArray();
+                        if (shieldType > 0)
+                        {
+                            if (shieldType == 2)
+                            {
+                                shieldType = 0;
+                                ClearRadius(20);
+                            }
+                            return LogicExit.Nothing;
+                        }
+                        SoundPlayer.PlaySound("death.wav", true);
+                        player.Lives--;
+                        shieldType = 1;
+                        protection = 60;
+                        break;
+                    }
+                }
 
             // Check for Game Over Condition
             if (player.Lives <= 0)
@@ -558,7 +524,7 @@ namespace Genshmup.Game
                 boss.Position.X + Math.Sign(destinationBoss.X - boss.Position.X) * (int)Math.Ceiling(Math.Abs(destinationBoss.X - boss.Position.X) / 12.0),
                 boss.Position.Y + Math.Sign(destinationBoss.Y - boss.Position.Y) * (int)Math.Ceiling(Math.Abs(destinationBoss.Y - boss.Position.Y) / 12.0)
             );
-            if (boss.Position == destinationBoss && new Random().Next(0, 100) == 0)
+            if (boss.Position == destinationBoss && new Random().Next(0, 140) == 0)
             {
                 destinationBoss = new Point(
                     new Random().Next(0, 446),
@@ -566,18 +532,36 @@ namespace Genshmup.Game
                 );
             }
             boss.Bound(CR);
-            if (new Random().Next(0, 11) == 0)
+
+            // Boss shoot
+            if (pulse > 0 || new Random().Next(0, 30) == 0)
             {
-                BossShoot(0);
-                if (boss.Health < 8000 && boss.Health >= 5000) BossShoot(1);
-                if (boss.Health < 5000) BossShoot(2);
+                if (pulseskip == 0)
+                {
+                    pulseskip = 3;
+                    if (pulse == 0) pulse = 12;
+                    else pulse--;
+                    for (int i = 0; i < 6; i++)
+                        BossShoot(0, new Point(
+                            boss.Position.X + (int)(3.0 * Math.Cos(i * 2.0 * Math.PI / 6.0)),
+                            boss.Position.Y + (int)(3.0 * Math.Sin(i * 2.0 * Math.PI / 6.0))
+                        ));
+                    if (boss.Health < 20000 && boss.Health >= 10000) BossShoot(1, boss.Position);
+                    if (boss.Health < 10000)
+                        for (int i = 0; i < 4; i++)
+                            BossShoot(2, new Point(
+                                boss.Position.X + (int)(3.0 * Math.Cos(i * Math.PI / 4.0 + Math.PI / 8.0)),
+                                boss.Position.Y + (int)(3.0 * Math.Sin(i * Math.PI / 4.0 + Math.PI / 8.0))
+                            ));
+                }
+                else pulseskip--;
             }
 
-            // She ded
+            // he ded
             if (boss.Health <= 0)
             {
                 SoundPlayer.PlaySound("boss_death.wav", true);
-                _nextScreen = 2;
+                _nextScreen = 3;
                 return LogicExit.ScreenChange;
             }
 
@@ -586,9 +570,30 @@ namespace Genshmup.Game
             {
                 for (int i = 0; i < bulletPositionsBoss[t].Length; i++)
                 {
+                    if (t == 2)
+                    {
+                        if (Vector2.Distance(new Vector2(bulletPositionsBoss[t][i].X, bulletPositionsBoss[t][i].Y), new Vector2(boss.Position.X, boss.Position.Y)) >= 174.0f)
+                        {
+                            List<SubBullet> sbl = subBullets.ToList();
+                            for (int s = 0; s < 4; s++)
+                            {
+                                SubBullet sb = new(bulletPositionsBoss[t][i], new Vector2(
+                                    3f * (float)Math.Cos(s * Math.PI / 4f + Math.PI / 8.0f),
+                                    3f * (float)Math.Sin(s * Math.PI / 4f + Math.PI / 8.0f)
+                                ));
+                                sbl.Add(sb);
+                            }
+                            subBullets = sbl.ToArray();
+                            List<Point> pres = bulletPositionsBoss[t].ToList();
+                            pres.Remove(bulletPositionsBoss[t][i]);
+                            bulletPositionsBoss[t] = pres.ToArray();
+                            i--;
+                            continue;
+                        }
+                    }
                     Vector2 cr = vectorFields[t](new Vector2(bulletPositionsBoss[t][i].X, bulletPositionsBoss[t][i].Y));
                     bulletPositionsBoss[t][i] = new Point((int)cr.X, (int)cr.Y);
-                    if (!new Rectangle(-120, -360, 720, 720).Contains(bulletPositionsBoss[t][i]))
+                    if (!CR.Contains(bulletPositionsBoss[t][i]))
                     {
                         List<Point> pres = bulletPositionsBoss[t].ToList();
                         pres.Remove(bulletPositionsBoss[t][i]);
@@ -596,6 +601,21 @@ namespace Genshmup.Game
                         i--;
                         continue;
                     }
+                }
+            }
+            for (int i = 0; i < subBullets.Length; i++)
+            {
+                subBullets[i].Position = new Point(
+                    (int)(subBullets[i].Position.X + subBullets[i].Direction.X),
+                    (int)(subBullets[i].Position.Y + subBullets[i].Direction.Y)
+                );
+                if (!CR.Contains(subBullets[i].Position))
+                {
+                    List<SubBullet> pres = subBullets.ToList();
+                    pres.Remove(subBullets[i]);
+                    subBullets = pres.ToArray();
+                    i--;
+                    continue;
                 }
             }
 
@@ -712,35 +732,29 @@ namespace Genshmup.Game
             }
         }
 
-        public static Vector2 Straight(Vector2 pos)
+        public static Vector2 SineDown(Vector2 pos)
         {
-            return new Vector2(0, 5) + pos;
+            return new Vector2(13.0f * -(float)Math.Sin(pos.Y / 31.4), 3) + pos;
         }
 
-        private Vector2 Spiral(Vector2 pos)
+        private Vector2 TightSpiral(Vector2 pos)
         {
-            pos -= EpiCenter;
+            pos -= new Vector2(boss.Position.X, boss.Position.Y);
 
             Polar polar = new(pos.Length(), (float)Math.Atan2(pos.Y, pos.X));
-            polar.radius += 1.2f;
-            polar.angle += 0.031415f;
+            polar.radius += 4.2f;
+            polar.angle += 0.011415f;
 
-            return EpiCenter + new Vector2(polar.radius * (float)Math.Cos(polar.angle), polar.radius * (float)Math.Sin(polar.angle));
+            return new Vector2(boss.Position.X, boss.Position.Y) + new Vector2(polar.radius * (float)Math.Cos(polar.angle), polar.radius * (float)Math.Sin(polar.angle));
         }
 
-        private Vector2 Target(Vector2 pos)
+        private Vector2 Spread(Vector2 pos)
         {
             Vector2 bpos = new(boss.Position.X, boss.Position.Y);
             pos -= bpos;
 
             Polar polar = new(pos.Length(), (float)Math.Atan2(pos.Y, pos.X));
-            polar.radius += 3.2f;
-            if (Math.Abs(pos.X) < 32 && Math.Abs(pos.Y) < 32)
-            {
-                Vector2 ppos = new Vector2(player.Position.X + 16, player.Position.Y + 16) - bpos;
-                polar.angle = (float)Math.Atan2(ppos.Y, ppos.X);
-                polar.radius += 32f;
-            }
+            polar.radius += 4 * MathF.Ceiling(32.0f / Vector2.Distance(bpos, pos + bpos));
 
             return bpos + new Vector2(polar.radius * (float)Math.Cos(polar.angle), polar.radius * (float)Math.Sin(polar.angle));
         }
