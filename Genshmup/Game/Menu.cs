@@ -41,6 +41,7 @@ namespace Genshmup.Game
         {
             ("BGM Volume", false, 100),
             ("SFX Volume", false, 100),
+            ("Opacity", false, 100),
             // ("Keep Aspect Ratio", true, 0),
             ("Back", true, 0)
         };
@@ -190,16 +191,20 @@ namespace Genshmup.Game
                         else SelectedSettingsIndex = (SelectedSettingsIndex + 1) % SettingItems.Length;
                         return LogicExit.Nothing;
                     case "Left":
+                        if (!settings) break;
                         if (!SettingItems[SelectedSettingsIndex].Item2)
                             SettingItems[SelectedSettingsIndex].Item3 = Math.Max(0, SettingItems[SelectedSettingsIndex].Item3 - 1);
                         SoundPlayer.Volume = SettingItems[0].Item3 / 100.0f;
                         SoundPlayer.SFXVolume = SettingItems[1].Item3 / 100.0f;
+                        Program.mainForm.Opacity = SettingItems[2].Item3 / 100.0;
                         break;
                     case "Right":
+                        if (!settings) break;
                         if (!SettingItems[SelectedSettingsIndex].Item2)
                             SettingItems[SelectedSettingsIndex].Item3 = Math.Min(100, SettingItems[SelectedSettingsIndex].Item3 + 1);
                         SoundPlayer.Volume = SettingItems[0].Item3 / 100.0f;
                         SoundPlayer.SFXVolume = SettingItems[1].Item3 / 100.0f;
+                        Program.mainForm.Opacity = SettingItems[2].Item3 / 100.0;
                         break;
                     case "Enter":
                     case "Z":
@@ -233,7 +238,7 @@ namespace Genshmup.Game
                         {
                             switch (SelectedSettingsIndex)
                             {
-                                case 2:
+                                case 3:
                                     settings = false;
                                     break;
                                 default:

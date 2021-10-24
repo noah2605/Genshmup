@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net6.0-windows7.0</TargetFramework>
+    <TargetFramework>net6.0-windows</TargetFramework>
     <Nullable>enable</Nullable>
     <UseWindowsForms>true</UseWindowsForms>
     <UseWPF>False</UseWPF>
@@ -42,6 +42,7 @@
     <None Remove="Assets\Sys\BGM\Menu.flac" />
     <None Remove="Assets\Sys\BGM\st1.flac" />
     <None Remove="Assets\Sys\BGM\st2.flac" />
+    <None Remove="Assets\Sys\BGM\st3.flac" />
     <None Remove="Assets\Sys\menu.ttf" />
     <None Remove="Assets\Sys\Sounds\boss_death.wav" />
     <None Remove="Assets\Sys\Sounds\death.wav" />
@@ -82,6 +83,7 @@
     <EmbeddedResource Include="Assets\Sys\BGM\menu.flac" />
     <EmbeddedResource Include="Assets\Sys\BGM\st1.flac" />
     <EmbeddedResource Include="Assets\Sys\BGM\st2.flac" />
+    <EmbeddedResource Include="Assets\Sys\BGM\st3.flac" />
     <EmbeddedResource Include="Assets\Sys\menu.ttf" />
     <EmbeddedResource Include="Assets\Sys\Sounds\boss_death.wav" />
     <EmbeddedResource Include="Assets\Sys\Sounds\death.wav" />
@@ -108,6 +110,21 @@
 
   <ItemGroup>
     <Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Properties\Resources.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Update="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
   </ItemGroup>
 
 </Project>

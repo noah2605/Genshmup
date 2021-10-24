@@ -593,7 +593,7 @@ namespace Genshmup.Game
                     }
                     Vector2 cr = vectorFields[t](new Vector2(bulletPositionsBoss[t][i].X, bulletPositionsBoss[t][i].Y));
                     bulletPositionsBoss[t][i] = new Point((int)cr.X, (int)cr.Y);
-                    if (!CR.Contains(bulletPositionsBoss[t][i]))
+                    if (!new Rectangle(-240, 0, 960, 360).Contains(bulletPositionsBoss[t][i]))
                     {
                         List<Point> pres = bulletPositionsBoss[t].ToList();
                         pres.Remove(bulletPositionsBoss[t][i]);

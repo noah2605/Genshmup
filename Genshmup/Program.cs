@@ -9,6 +9,8 @@ namespace Genshmup
 {
     internal static class Program
     {
+        public static MainForm? mainForm;
+
         /// <summary>
         ///  The main entry point for the application.
         /// </summary>
@@ -16,7 +18,8 @@ namespace Genshmup
         static void Main()
         {
             ApplicationConfiguration.Initialize();
-            Application.Run(new MainForm());
+            mainForm = new();
+            Application.Run(mainForm);
         }
     }
 }

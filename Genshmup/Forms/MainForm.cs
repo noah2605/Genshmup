@@ -10,7 +10,7 @@ namespace Genshmup
 {
     public partial class MainForm : Form
     {
-        private readonly Graphics g;
+        private Graphics g;
         private BufferedGraphics buffer;
 
         private int phase = 0;
@@ -110,6 +110,7 @@ namespace Genshmup
         {
             try
             {
+                g = CreateGraphics();
                 buffer = BufferedGraphicsManager.Current.Allocate(g, ClientRectangle);
             }
             catch { }
