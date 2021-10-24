@@ -476,7 +476,7 @@ namespace Genshmup.Game
             }
 
             // Check for Game Over Condition
-            if (player.Lives <= 0)
+            if (player.Lives <= 0 && Program.mainForm != null && Program.mainForm.invincible)
             {
                 selectedIndex = 0;
                 SoundPlayer.PlaySound("stage_failed.wav", true);
