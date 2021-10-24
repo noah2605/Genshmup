@@ -31,6 +31,9 @@ namespace Genshmup.Game
                     case "D3":
                         _nextScreen = 3;
                         return LogicExit.ScreenChange;
+                    case "D4":
+                        _nextScreen = 4;
+                        return LogicExit.ScreenChange;
                 }
 
             return base.Logic(events);
