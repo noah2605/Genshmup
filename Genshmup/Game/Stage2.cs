@@ -730,6 +730,15 @@ namespace Genshmup.Game
                 );
                 bulletPositionsBoss[i] = remBullets.ToArray();
             }
+            List<SubBullet> remSubBullets = subBullets.ToList();
+            remSubBullets.RemoveAll(sb => {
+                Point p = sb.Position;
+                return (Math.Abs(p.X - player.Position.X) <= radius ||
+                    Math.Abs(p.X - player.Position.X - player.Size.Width) <= radius) &&
+                    (Math.Abs(p.Y - player.Position.Y) <= radius ||
+                    Math.Abs(p.Y - player.Position.Y - player.Size.Height) <= radius);
+                });
+            subBullets = remSubBullets.ToArray();
         }
 
         public static Vector2 SineDown(Vector2 pos)

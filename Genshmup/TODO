@@ -1,4 +1,10 @@
 stage select screen
 Music Room screen
 
-bullet class
+for next bullet hell:
+Bullet class {
+	own epicenter
+	own vectorfield/direction vector
+	bullet image/element on atlas
+	render function
+}

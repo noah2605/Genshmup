@@ -196,7 +196,7 @@ namespace Genshmup.Game
                             SettingItems[SelectedSettingsIndex].Item3 = Math.Max(0, SettingItems[SelectedSettingsIndex].Item3 - 1);
                         SoundPlayer.Volume = SettingItems[0].Item3 / 100.0f;
                         SoundPlayer.SFXVolume = SettingItems[1].Item3 / 100.0f;
-                        Program.mainForm.Opacity = SettingItems[2].Item3 / 100.0;
+                        if (Program.mainForm != null) Program.mainForm.Opacity = SettingItems[2].Item3 / 100.0;
                         break;
                     case "Right":
                         if (!settings) break;
@@ -204,7 +204,7 @@ namespace Genshmup.Game
                             SettingItems[SelectedSettingsIndex].Item3 = Math.Min(100, SettingItems[SelectedSettingsIndex].Item3 + 1);
                         SoundPlayer.Volume = SettingItems[0].Item3 / 100.0f;
                         SoundPlayer.SFXVolume = SettingItems[1].Item3 / 100.0f;
-                        Program.mainForm.Opacity = SettingItems[2].Item3 / 100.0;
+                        if (Program.mainForm != null) Program.mainForm.Opacity = SettingItems[2].Item3 / 100.0;
                         break;
                     case "Enter":
                     case "Z":

@@ -18,10 +18,15 @@ namespace Genshmup.Game
 
         private readonly Font titlefont;
 
-        private SubBullet[] subBullets;
-
         private int pulse = 0;
         private int pulseskip = 3;
+
+        private int beamTimeout = 30;
+
+        private int qlock = 0;
+
+        private Point[][] beams;
+        private SubBullet[] subBullets;
 
         private Func<Vector2, Vector2>[] vectorFields;
 
@@ -41,11 +46,11 @@ namespace Genshmup.Game
 
             vectorFields = new Func<Vector2, Vector2>[]
             {
+                CosSpread,
                 TightSpiral,
-                SineDown,
-                Spread
+                CosSpread
             };
-
+            beams = Array.Empty<Point[]>();
             subBullets = Array.Empty<SubBullet>();
         }
 
@@ -173,7 +178,8 @@ namespace Genshmup.Game
 
                 DanmakuGraphics.RenderAtlas(g, bulletAtlas, bulletElementsBoss, bulletPositionsBoss);
 
-                for (int i = 0; i < subBullets.Length; i++) g.DrawImage(bulletAtlas, new Rectangle(subBullets[i].Position, new Size(16, 16)), bulletElementsBoss[1], GraphicsUnit.Pixel);
+                foreach (Point[] pa in beams) g.FillPolygon(new LinearGradientBrush(pa[0], pa[2], Color.FromArgb(60, 255, 235, 218), Color.FromArgb(80, Color.DarkRed)), pa);
+                for (int i = 0; i < subBullets.Length; i++) g.DrawImage(bulletAtlas, new Rectangle(subBullets[i].Position, new Size(16, 16)), bulletElementsBoss[2], GraphicsUnit.Pixel);
 
                 // Health Bars and other Info
                 for (int i = 0; i < Math.Min(player.Lives, 3); i++) g.DrawImage(Heart, new Point(475 - 16 * (i + 1), 5));
@@ -490,6 +496,34 @@ namespace Genshmup.Game
                 if (sbreak) break;
             }
             if (!sbreak)
+                for (int i = 0; i < beams.Length; i++)
+                {
+                    if (DanmakuGraphics.PolygonContains(beams[i], player.Position) ||
+                        DanmakuGraphics.PolygonContains(beams[i], new Point(player.Position.X + player.Size.Width, player.Position.Y + player.Size.Height)))
+                    {
+                        List<Point[]> bms = beams.ToList();
+                        bms.Remove(beams[i]);
+                        beams = bms.ToArray();
+                        if (shieldType > 0)
+                        {
+                            // Only absorb a single hit if shield is from E
+                            if (shieldType == 2)
+                            {
+                                shieldType = 0;
+                                // Clear bullets in near distance
+                                ClearRadius(20);
+                            }
+                            return LogicExit.Nothing;
+                        }
+                        SoundPlayer.PlaySound("death.wav", true);
+                        player.Lives--;
+                        shieldType = 1;
+                        protection = 60;
+                        sbreak = true;
+                        break;
+                    }
+                }
+            if (!sbreak)
                 for (int i = 0; i < subBullets.Length; i++)
                 {
                     Point ta = subBullets[i].Position;
@@ -525,41 +559,74 @@ namespace Genshmup.Game
             }
 
             // Move boss
-            boss.Position = new Point(
-                boss.Position.X + Math.Sign(destinationBoss.X - boss.Position.X) * (int)Math.Ceiling(Math.Abs(destinationBoss.X - boss.Position.X) / 12.0),
-                boss.Position.Y + Math.Sign(destinationBoss.Y - boss.Position.Y) * (int)Math.Ceiling(Math.Abs(destinationBoss.Y - boss.Position.Y) / 12.0)
-            );
-            if (boss.Position == destinationBoss && new Random().Next(0, 140) == 0)
+            if (qlock == 0)
             {
-                destinationBoss = new Point(
-                    new Random().Next(0, 446),
-                    new Random().Next(0, 100)
+                boss.Position = new Point(
+                    boss.Position.X + Math.Sign(destinationBoss.X - boss.Position.X) * (int)Math.Ceiling(Math.Abs(destinationBoss.X - boss.Position.X) / 12.0),
+                    boss.Position.Y + Math.Sign(destinationBoss.Y - boss.Position.Y) * (int)Math.Ceiling(Math.Abs(destinationBoss.Y - boss.Position.Y) / 12.0)
                 );
+                if (boss.Position == destinationBoss && new Random().Next(0, 140) == 0)
+                {
+                    destinationBoss = new Point(
+                        new Random().Next(0, 446),
+                        new Random().Next(0, 100)
+                    );
+                }
+                boss.Bound(CR);
             }
-            boss.Bound(CR);
 
             // Boss shoot
+            if (beamTimeout == -400)
+            {
+                if (beams.Length == 0 && (boss.Health > 24000 || boss.Health < 12000) && new Random().Next(0, 10) == 0)
+                {
+                    List<Point[]> bms = beams.ToList();
+                    for (int i = 0; i < 6; i++) bms.Add(DanmakuGraphics.Parallelogram(new Point(boss.Position.X + 16, boss.Position.Y + 16), 9, 600, (int)(i * Math.PI / 3)));
+                    beams = bms.ToArray();
+                    beamTimeout = 400;
+                }
+            }
+            else if (beamTimeout == 0)
+            {
+                beams = Array.Empty<Point[]>();
+                beamTimeout--;
+            }
+            else beamTimeout--;
             if (pulse > 0 || new Random().Next(0, 30) == 0)
             {
                 if (pulseskip == 0)
                 {
                     pulseskip = 3;
-                    if (pulse == 0) pulse = 12;
+                    if (pulse == 0)
+                    {
+                        pulse = 6;
+                    }
                     else pulse--;
-                    for (int i = 0; i < 6; i++)
+                    for (int i = 0; i < 5; i++)
                         BossShoot(0, new Point(
-                            boss.Position.X + (int)(3.0 * Math.Cos(i * 2.0 * Math.PI / 6.0)),
-                            boss.Position.Y + (int)(3.0 * Math.Sin(i * 2.0 * Math.PI / 6.0))
+                            boss.Position.X + (int)(8.0 * Math.Cos(i * Math.PI / 2.5)),
+                            boss.Position.Y + (int)(8.0 * Math.Sin(i * Math.PI / 2.5))
                         ));
-                    if (boss.Health < 20000 && boss.Health >= 10000) BossShoot(1, boss.Position);
-                    if (boss.Health < 10000)
-                        for (int i = 0; i < 4; i++)
+                    if (boss.Health < 24000)
+                        for (int i = 0; i < 2; i++)
                             BossShoot(2, new Point(
-                                boss.Position.X + (int)(3.0 * Math.Cos(i * Math.PI / 4.0 + Math.PI / 8.0)),
-                                boss.Position.Y + (int)(3.0 * Math.Sin(i * Math.PI / 4.0 + Math.PI / 8.0))
+                                boss.Position.X + (int)(3.0 * Math.Cos(i * Math.PI / 2.0 + Math.PI / 4.0)),
+                                boss.Position.Y + (int)(3.0 * Math.Sin(i * Math.PI / 2.0 + Math.PI / 4.0))
                             ));
                 }
                 else pulseskip--;
+            }
+            if (boss.Health < 36000 && boss.Health >= 12000 && bulletPositionsBoss[1].Length < 100 && new Random().Next(0, 40) == 0)
+            {
+                int gap = new Random().Next(0, 50);
+                for (int i = 0; i < 100; i++)
+                {
+                    if (!(i < gap + 10 && i >= gap))
+                        BossShoot(1, new Point(
+                                boss.Position.X + (int)(20.0 * Math.Cos(i * Math.PI / 50.0)),
+                                boss.Position.Y + (int)(20.0 * Math.Sin(i * Math.PI / 50.0))
+                            ));
+                }
             }
 
             // she ded
@@ -580,11 +647,11 @@ namespace Genshmup.Game
                         if (Vector2.Distance(new Vector2(bulletPositionsBoss[t][i].X, bulletPositionsBoss[t][i].Y), new Vector2(boss.Position.X, boss.Position.Y)) >= 174.0f)
                         {
                             List<SubBullet> sbl = subBullets.ToList();
-                            for (int s = 0; s < 4; s++)
+                            for (int s = 0; s < 2; s++)
                             {
                                 SubBullet sb = new(bulletPositionsBoss[t][i], new Vector2(
-                                    3f * (float)Math.Cos(s * Math.PI / 4f + Math.PI / 8.0f),
-                                    3f * (float)Math.Sin(s * Math.PI / 4f + Math.PI / 8.0f)
+                                    3f * (float)Math.Cos(s * Math.PI / 2f + Math.PI / 4.0f),
+                                    3f * (float)Math.Sin(s * Math.PI / 2f + Math.PI / 4.0f)
                                 ));
                                 sbl.Add(sb);
                             }
@@ -608,6 +675,10 @@ namespace Genshmup.Game
                     }
                 }
             }
+            for (int i = 0; i < beams.Length; i++)
+            {
+                beams[i] = DanmakuGraphics.Parallelogram(beams[i], new Point(boss.Position.X + 16, boss.Position.Y + 16), 9, 600, 0.006f);
+            }
             for (int i = 0; i < subBullets.Length; i++)
             {
                 subBullets[i].Position = new Point(
@@ -625,6 +696,7 @@ namespace Genshmup.Game
             }
 
             // Advance player bullets
+            qlock = Math.Max(0, qlock - 1);
             for (int t = 0; t < bulletPositions.Length; t++)
             {
                 if (_bulletCooldowns[t] < bulletCooldowns[t])
@@ -633,7 +705,11 @@ namespace Genshmup.Game
                     if (_bulletCooldowns[t] == bulletCooldowns[t])
                     {
                         if (t == 1) SoundPlayer.PlaySound("elem_3.wav", true);
-                        if (t == 2) SoundPlayer.PlaySound("ult_3.wav", true);
+                        if (t == 2)
+                        {
+                            SoundPlayer.PlaySound("ult_3.wav", true);
+                            qlock = 500;
+                        }
                     }
                 }
                 for (int i = 0; i < bulletPositions[t].Length; i++)
@@ -737,11 +813,6 @@ namespace Genshmup.Game
             }
         }
 
-        public static Vector2 SineDown(Vector2 pos)
-        {
-            return new Vector2(13.0f * -(float)Math.Sin(pos.Y / 31.4), 3) + pos;
-        }
-
         private Vector2 TightSpiral(Vector2 pos)
         {
             pos -= new Vector2(boss.Position.X, boss.Position.Y);
@@ -749,6 +820,17 @@ namespace Genshmup.Game
             Polar polar = new(pos.Length(), (float)Math.Atan2(pos.Y, pos.X));
             polar.radius += 4.2f;
             polar.angle += 0.011415f;
+
+            return new Vector2(boss.Position.X, boss.Position.Y) + new Vector2(polar.radius * (float)Math.Cos(polar.angle), polar.radius * (float)Math.Sin(polar.angle));
+        }
+
+        private Vector2 CosSpread(Vector2 pos)
+        {
+            pos -= new Vector2(boss.Position.X, boss.Position.Y);
+
+            Polar polar = new(pos.Length(), (float)Math.Atan2(pos.Y, pos.X));
+            polar.radius += 2.2f;
+            polar.angle += 0.262f * MathF.Cos(polar.radius / 10f) * 10.0f / polar.radius;
 
             return new Vector2(boss.Position.X, boss.Position.Y) + new Vector2(polar.radius * (float)Math.Cos(polar.angle), polar.radius * (float)Math.Sin(polar.angle));
         }
