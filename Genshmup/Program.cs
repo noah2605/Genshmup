@@ -15,10 +15,12 @@ namespace Genshmup
         ///  The main entry point for the application.
         /// </summary>
         [STAThread]
-        static void Main()
+        static void Main(string[] args)
         {
             ApplicationConfiguration.Initialize();
             mainForm = new();
+            if (args.Contains("invc"))
+                mainForm.invincible = true;
             Application.Run(mainForm);
         }
     }

@@ -14,6 +14,7 @@ namespace Genshmup
         private BufferedGraphics buffer;
 
         private int phase = 0;
+        public bool invincible = false;
 
         private HelperClasses.Screen[] screens = new HelperClasses.Screen[7];
 
