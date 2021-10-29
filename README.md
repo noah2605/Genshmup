@@ -1,6 +1,7 @@
 # Genshmup
 
 A Genshin Themed Danmaku Shooter written in C# .NET 6 using GDI+
+Officially 0 Warnings AND 0 Messages in Visual Studio haha take that
 
 ![Ganmyu](./Genshmup/Assets/ganyu.png)
 
