@@ -83,7 +83,7 @@ namespace Genshmup
                 phase = Math.Max(0, Math.Min(nextScreen, screens.Length));
                 screens[phase].Init();
             }
-            if (phase == 0) eventBuffer.Clear(); // BIOS Input for Menu
+            if (phase == 0 || phase == 5 || phase == 6) eventBuffer.Clear(); // BIOS Input for Menus
             return false;
         }
 

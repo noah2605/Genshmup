@@ -32,7 +32,7 @@ namespace Genshmup.Game
 
             parsedDialog = DialogParser.Parse(new StreamReader(ResourceLoader.LoadResource(null, "Ending.dlg") ?? Stream.Null).ReadToEnd());
 
-            BGI = Image.FromStream(ResourceLoader.LoadResource(null, "ganyu.png") ?? Stream.Null);
+            BGI = Image.FromStream(ResourceLoader.LoadResource(null, "sucroseWW.png") ?? Stream.Null);
         }
 
         public override void Init()

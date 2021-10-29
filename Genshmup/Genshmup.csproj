@@ -39,6 +39,7 @@
     <None Remove="Assets\sonja.png" />
     <None Remove="Assets\sonjaboss.png" />
     <None Remove="Assets\sonjaglow.png" />
+    <None Remove="Assets\sucroseWW.png" />
     <None Remove="Assets\Sys\BGM\Menu.flac" />
     <None Remove="Assets\Sys\BGM\st1.flac" />
     <None Remove="Assets\Sys\BGM\st2.flac" />
@@ -80,6 +81,7 @@
     <EmbeddedResource Include="Assets\sonja.png" />
     <EmbeddedResource Include="Assets\sonjaboss.png" />
     <EmbeddedResource Include="Assets\sonjaglow.png" />
+    <EmbeddedResource Include="Assets\sucroseWW.png" />
     <EmbeddedResource Include="Assets\Sys\BGM\menu.flac" />
     <EmbeddedResource Include="Assets\Sys\BGM\st1.flac" />
     <EmbeddedResource Include="Assets\Sys\BGM\st2.flac" />
