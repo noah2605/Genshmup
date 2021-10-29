@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.IO;
-using Genshmup.HelperClasses;
 using System.Drawing;
-using System.Reflection;
 using System.Drawing.Text;
+using System.IO;
+using System.Linq;
+using System.Reflection;
+using Genshmup.HelperClasses;
 
 namespace Genshmup.Game
 {
@@ -15,7 +15,7 @@ namespace Genshmup.Game
         private bool paused = false;
         private int selectedIndex = 0;
 
-        Image BGI;
+        private Image BGI;
 
         private int keysleep = 0;
 
@@ -37,7 +37,7 @@ namespace Genshmup.Game
 
         public override void Init()
         {
-            
+
         }
 
         public override void Render(Graphics g)

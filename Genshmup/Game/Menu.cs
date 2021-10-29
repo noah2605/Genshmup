@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Drawing.Text;
-using Genshmup.HelperClasses;
 using System.Drawing;
+using System.Drawing.Text;
+using System.Linq;
 using System.Reflection;
+using Genshmup.HelperClasses;
 
 namespace Genshmup.Game
 {
@@ -26,7 +26,7 @@ namespace Genshmup.Game
 
         private readonly List<Image> renderedList;
         private IEnumerator<Image> rendered;
-        readonly Point[] noisePoints = new Point[8];
+        private readonly Point[] noisePoints = new Point[8];
 
         private readonly string[] MenuItems =
         {
@@ -54,7 +54,7 @@ namespace Genshmup.Game
             ItemFontSize = 22;
             titlefont = new Font(ResourceLoader.LoadFont(Assembly.GetExecutingAssembly(), "menu.ttf") ?? new FontFamily(GenericFontFamilies.Serif), TitleFontSize);
             itemfont = new Font(ResourceLoader.LoadFont(Assembly.GetExecutingAssembly(), "menu.ttf") ?? new FontFamily(GenericFontFamilies.Serif), ItemFontSize);
-            
+
             sf = new();
             sf.LineAlignment = StringAlignment.Near;
             sf.Trimming = StringTrimming.Word;
@@ -82,7 +82,7 @@ namespace Genshmup.Game
 
                 // Title
                 sf.Alignment = StringAlignment.Center;
-                g.DrawString(settings ? "Settings" : "Genshmup", titlefont, 
+                g.DrawString(settings ? "Settings" : "Genshmup", titlefont,
                     new SolidBrush(DanmakuGraphics.ColorFromUInt(0xFFFFFFFF)), new Point(240, 0), sf);
 
                 // Menu Items
@@ -93,7 +93,7 @@ namespace Genshmup.Game
                         if (SelectedIndex == i)
                         {
                             g.DrawString(MenuItems[i], itemfont, Brushes.White, new Point(120, 80 + i * 40), sf);
-                            g.DrawString(MenuItems[i], new Font(itemfont, FontStyle.Bold), 
+                            g.DrawString(MenuItems[i], new Font(itemfont, FontStyle.Bold),
                                 new SolidBrush(DanmakuGraphics.ColorFromUInt(0x7FFFFFFF)), new Point(120, 80 + i * 40), sf);
                         }
                         else g.DrawString(MenuItems[i], itemfont, Brushes.Gray, new Point(120, 80 + i * 40), sf);
@@ -107,7 +107,7 @@ namespace Genshmup.Game
                         if (SelectedSettingsIndex == i)
                         {
                             g.DrawString(SettingItems[i].Item1, itemfont, Brushes.White, new Point(20, 80 + i * 40), sf);
-                            g.DrawString(SettingItems[i].Item1, new Font(itemfont, FontStyle.Bold), 
+                            g.DrawString(SettingItems[i].Item1, new Font(itemfont, FontStyle.Bold),
                                 new SolidBrush(DanmakuGraphics.ColorFromUInt(0x7FFFFFFF)), new Point(20, 80 + i * 40), sf);
                         }
                         else g.DrawString(SettingItems[i].Item1, itemfont, Brushes.Gray, new Point(20, 80 + i * 40), sf);
@@ -117,7 +117,7 @@ namespace Genshmup.Game
                     {
                         if (SelectedSettingsIndex == i)
                         {
-                            g.DrawString(ItemToString(SettingItems[i].Item2, SettingItems[i].Item3), itemfont, 
+                            g.DrawString(ItemToString(SettingItems[i].Item2, SettingItems[i].Item3), itemfont,
                                 Brushes.White, new Point(360, 80 + i * 40), sf);
                             g.DrawString(ItemToString(SettingItems[i].Item2, SettingItems[i].Item3), new Font(itemfont, FontStyle.Bold),
                                 new SolidBrush(DanmakuGraphics.ColorFromUInt(0x7FFFFFFF)), new Point(360, 80 + i * 40), sf);
@@ -140,12 +140,13 @@ namespace Genshmup.Game
             else return Convert.ToString(value);
         }
 
-        private Image GenerateNoise() { 
+        private Image GenerateNoise()
+        {
             int maxX = 100;
             int maxY = 100;
             Bitmap bmp = new(maxX, maxY);
             Random rng = new(DateTime.Now.Millisecond);
-            
+
 
             if (Point.Empty.Equals(noisePoints[0]))
                 for (int i = 0; i < noisePoints.Length; i++)
@@ -153,8 +154,8 @@ namespace Genshmup.Game
             else
                 for (int i = 0; i < noisePoints.Length; i++)
                     noisePoints[i] = new Point(
-                        Math.Max(0, Math.Min(maxX, noisePoints[i].X + rng.Next(-maxX/10, maxX/10))), 
-                        Math.Max(0, Math.Min(maxY, noisePoints[i].Y + rng.Next(-maxY/10, maxY/10)))
+                        Math.Max(0, Math.Min(maxX, noisePoints[i].X + rng.Next(-maxX / 10, maxX / 10))),
+                        Math.Max(0, Math.Min(maxY, noisePoints[i].Y + rng.Next(-maxY / 10, maxY / 10)))
                     );
 
             for (int y = 0; y < maxY; y++)

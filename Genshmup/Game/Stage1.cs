@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
+using System.Drawing.Drawing2D;
+using System.Drawing.Text;
+using System.IO;
 using System.Linq;
 using System.Numerics;
-using Genshmup.HelperClasses;
-using System.Drawing;
 using System.Reflection;
-using System.Drawing.Text;
-using System.Drawing.Drawing2D;
-using System.IO;
+using Genshmup.HelperClasses;
 
 namespace Genshmup.Game
 {
@@ -19,7 +19,7 @@ namespace Genshmup.Game
         private readonly Font titlefont;
 
 
-        private Func<Vector2, Vector2>[] vectorFields;
+        private readonly Func<Vector2, Vector2>[] vectorFields;
         private Vector2 EpiCenter;
 
         public Stage1() : base()

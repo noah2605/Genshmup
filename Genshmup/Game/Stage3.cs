@@ -1,19 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
+using System.Drawing.Drawing2D;
+using System.Drawing.Text;
+using System.IO;
 using System.Linq;
 using System.Numerics;
-using Genshmup.HelperClasses;
-using System.Drawing;
 using System.Reflection;
-using System.Drawing.Text;
-using System.Drawing.Drawing2D;
-using System.IO;
+using Genshmup.HelperClasses;
 
 namespace Genshmup.Game
 {
     public class Stage3 : Stage
     {
-        private Image Dvalin;
+        private readonly Image Dvalin;
         private Image Sonja;
 
         private readonly Font titlefont;
@@ -28,7 +28,7 @@ namespace Genshmup.Game
         private Point[][] beams;
         private SubBullet[] subBullets;
 
-        private Func<Vector2, Vector2>[] vectorFields;
+        private readonly Func<Vector2, Vector2>[] vectorFields;
 
         public Stage3() : base()
         {
@@ -833,17 +833,6 @@ namespace Genshmup.Game
             polar.angle += 0.262f * MathF.Cos(polar.radius / 10f) * 10.0f / polar.radius;
 
             return new Vector2(boss.Position.X, boss.Position.Y) + new Vector2(polar.radius * (float)Math.Cos(polar.angle), polar.radius * (float)Math.Sin(polar.angle));
-        }
-
-        private Vector2 Spread(Vector2 pos)
-        {
-            Vector2 bpos = new(boss.Position.X, boss.Position.Y);
-            pos -= bpos;
-
-            Polar polar = new(pos.Length(), (float)Math.Atan2(pos.Y, pos.X));
-            polar.radius += 4 * MathF.Ceiling(32.0f / Vector2.Distance(bpos, pos + bpos));
-
-            return bpos + new Vector2(polar.radius * (float)Math.Cos(polar.angle), polar.radius * (float)Math.Sin(polar.angle));
         }
     }
 }

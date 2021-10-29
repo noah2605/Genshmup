@@ -1,13 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Genshmup.HelperClasses;
-using System.Reflection;
+﻿using System.Drawing;
 using System.Drawing.Text;
-using System.Drawing.Drawing2D;
+using System.Reflection;
+using Genshmup.HelperClasses;
 
 namespace Genshmup.Game
 {
@@ -49,8 +43,8 @@ namespace Genshmup.Game
         public override LogicExit Logic(string[] events)
         {
             foreach (string ev in events)
-            switch (ev)
-            {
+                switch (ev)
+                {
                     case "Up":
                         SoundPlayer.PlaySound("select.wav", true);
                         selectedIndex = (selectedIndex - 1 < 0 ? trackList.Length : selectedIndex) - 1;
@@ -71,10 +65,10 @@ namespace Genshmup.Game
                             playing = selectedIndex;
                         }
                         break;
-                case "Escape":
-                    _nextScreen = 0;
-                    return LogicExit.ScreenChange;
-            }
+                    case "Escape":
+                        _nextScreen = 0;
+                        return LogicExit.ScreenChange;
+                }
 
             return base.Logic(events);
         }

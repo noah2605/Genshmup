@@ -1,12 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Genshmup.HelperClasses;
-using System.Reflection;
+﻿using System.Drawing;
 using System.Drawing.Text;
+using System.Reflection;
+using Genshmup.HelperClasses;
 
 namespace Genshmup.Game
 {

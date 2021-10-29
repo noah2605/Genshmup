@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Drawing;
 
 namespace Genshmup.HelperClasses
@@ -15,8 +11,8 @@ namespace Genshmup.HelperClasses
 
         public Point Position { get => _position; set => _position = value; }
         public Size Size { get => _size; set => _size = value; }
-        public int Health {  get => _health; set => _health = value; }
-        public Rectangle Rect { get => new(_position.X, _position.Y, _size.Width, _size.Height); }
+        public int Health { get => _health; set => _health = value; }
+        public Rectangle Rect => new(_position.X, _position.Y, _size.Width, _size.Height);
 
         public Boss()
         {

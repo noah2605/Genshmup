@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
+using System.Drawing.Drawing2D;
+using System.Drawing.Text;
+using System.IO;
 using System.Linq;
 using System.Numerics;
-using Genshmup.HelperClasses;
-using System.Drawing;
 using System.Reflection;
-using System.Drawing.Text;
-using System.Drawing.Drawing2D;
-using System.IO;
+using Genshmup.HelperClasses;
 
 namespace Genshmup.Game
 {
@@ -23,7 +23,7 @@ namespace Genshmup.Game
         private int pulse = 0;
         private int pulseskip = 3;
 
-        private Func<Vector2, Vector2>[] vectorFields;
+        private readonly Func<Vector2, Vector2>[] vectorFields;
 
         public Stage2() : base()
         {
@@ -737,7 +737,7 @@ namespace Genshmup.Game
                     Math.Abs(p.X - player.Position.X - player.Size.Width) <= radius) &&
                     (Math.Abs(p.Y - player.Position.Y) <= radius ||
                     Math.Abs(p.Y - player.Position.Y - player.Size.Height) <= radius);
-                });
+            });
             subBullets = remSubBullets.ToArray();
         }
 

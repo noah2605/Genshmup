@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
-using System.Windows.Forms;
-using Genshmup.HelperClasses;
-using Genshmup.Game;
 using System.Threading;
+using System.Windows.Forms;
+using Genshmup.Game;
+using Genshmup.HelperClasses;
 
 namespace Genshmup
 {

@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 
@@ -13,35 +10,31 @@ namespace Genshmup.HelperClasses
         public static void DrawRoundedRectangle(this Graphics graphics, Pen pen, Rectangle bounds, int cornerRadius)
         {
             if (graphics == null)
-                throw new ArgumentNullException("graphics");
+                throw new ArgumentNullException(nameof(graphics));
             if (pen == null)
-                throw new ArgumentNullException("pen");
+                throw new ArgumentNullException(nameof(pen));
 
-            using (GraphicsPath path = RoundedRect(bounds, cornerRadius))
-            {
-                graphics.DrawPath(pen, path);
-            }
+            using GraphicsPath path = RoundedRect(bounds, cornerRadius);
+            graphics.DrawPath(pen, path);
         }
 
         public static void FillRoundedRectangle(this Graphics graphics, Brush brush, Rectangle bounds, int cornerRadius)
         {
             if (graphics == null)
-                throw new ArgumentNullException("graphics");
+                throw new ArgumentNullException(nameof(graphics));
             if (brush == null)
-                throw new ArgumentNullException("brush");
+                throw new ArgumentNullException(nameof(brush));
 
-            using (GraphicsPath path = RoundedRect(bounds, cornerRadius))
-            {
-                graphics.FillPath(brush, path);
-            }
+            using GraphicsPath path = RoundedRect(bounds, cornerRadius);
+            graphics.FillPath(brush, path);
         }
 
         public static GraphicsPath RoundedRect(Rectangle bounds, int radius)
         {
             int diameter = radius * 2;
-            Size size = new Size(diameter, diameter);
-            Rectangle arc = new Rectangle(bounds.Location, size);
-            GraphicsPath path = new GraphicsPath();
+            Size size = new(diameter, diameter);
+            Rectangle arc = new(bounds.Location, size);
+            GraphicsPath path = new();
 
             if (radius == 0)
             {
@@ -81,14 +74,14 @@ namespace Genshmup.HelperClasses
         {
             int dx = parallelogram[1].X - parallelogram[2].X;
             int dy = parallelogram[1].Y - parallelogram[2].Y;
-            float angle = MathF.Atan2(dy, dx) - MathF.PI/2;
+            float angle = MathF.Atan2(dy, dx) - MathF.PI / 2;
             return Parallelogram(newfulcrum, width, height, angle + angleincre);
         }
 
         public static bool PolygonContains(Point[] vertices, Point p)
         {
             bool collision = false;
-            int n = 0;
+            int n;
             for (int c = 0; c < vertices.Length; c++)
             {
                 n = (c + 1) % vertices.Length;
