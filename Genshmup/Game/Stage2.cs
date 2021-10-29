@@ -264,6 +264,7 @@ namespace Genshmup.Game
             }
             if (type == 2)
             {
+                elementalEnergy = 0;
                 protection = 800;
                 shieldType = 3;
                 ClearRadius(50);
