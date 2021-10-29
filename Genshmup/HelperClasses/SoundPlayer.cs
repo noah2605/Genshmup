@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using NAudio.Wave;
+using NAudio.Wave.SampleProviders;
 
 namespace Genshmup.HelperClasses
 {
@@ -25,11 +26,17 @@ namespace Genshmup.HelperClasses
         {
             WasapiOut ap = new();
             StreamMediaFoundationReader reader = new(ResourceLoader.LoadResource(null, name));
-            ap.Init(reader);
+            if (sfx)
+            {
+                VolumeSampleProvider vsp = new(reader.ToSampleProvider());
+                vsp.Volume = _sfxvolume;
+            }
+            else 
+                ap.Init(reader);
             ap.Play();
             audioPlayers.Add((ap, name, sfx));
             ap.PlaybackStopped += DeleteAudioPlayer;
-            ChangeVolume(sfx ? _sfxvolume : _volume, sfx);
+            ChangeVolume(_volume, false);
         }
 
         public static void PlaySoundLoop(string name)
@@ -49,8 +56,9 @@ namespace Genshmup.HelperClasses
             else _volume = vol;
             for (int i = 0; i < audioPlayers.Count; i++)
             {
-                for (int c = 0; c < audioPlayers[i].Item1.AudioStreamVolume.ChannelCount; c++)
-                    audioPlayers[i].Item1.AudioStreamVolume.SetChannelVolume(c, audioPlayers[i].Item3 ? _sfxvolume : _volume);
+                if (!audioPlayers[i].Item3)
+                    for (int c = 0; c < audioPlayers[i].Item1.AudioStreamVolume.ChannelCount; c++)
+                        audioPlayers[i].Item1.AudioStreamVolume.SetChannelVolume(c, audioPlayers[i].Item3 ? _sfxvolume : _volume);
             }
         }
 
