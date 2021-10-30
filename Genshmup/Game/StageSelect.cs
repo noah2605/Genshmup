@@ -18,9 +18,16 @@ namespace Genshmup.Game
             ("Ending", "sucroseWW.png")
         };
 
+        private Image[] icons;
+
         public StageSelect()
         {
             titlefont = new Font(ResourceLoader.LoadFont(Assembly.GetExecutingAssembly(), "menu.ttf") ?? new FontFamily(GenericFontFamilies.Serif), 24);
+            icons = new Image[stageList.Length];
+            for (int i = 0; i < stageList.Length; i++)
+            {
+                icons[i] = Image.FromStream(ResourceLoader.LoadResource(null, stageList[i].Item2) ?? System.IO.Stream.Null);
+            }
         }
 
         public override void Render(Graphics g)
@@ -31,12 +38,12 @@ namespace Genshmup.Game
             for (int i = 0; i < stageList.Length; i++)
             {
                 Point ogn = new(10 + (i % 2) * 220, 40 + (i > 1 ? 140 : 0));
+                g.DrawImage(icons[i], new Rectangle(ogn.X + 64, ogn.Y + 8, 72, 72));
                 g.DrawRoundedRectangle(new Pen(Color.Gray, 6f), new Rectangle(ogn, new Size(200, 100)), 18);
                 g.DrawString(stageList[i].Item1, new Font(titlefont.FontFamily, 10f, FontStyle.Bold), Brushes.Gray, new Point(ogn.X + 100, ogn.Y + 100),
                     new StringFormat() { Alignment = StringAlignment.Center, LineAlignment = StringAlignment.Far });
                 if (selectedIndex == i)
                 {
-                    g.DrawImage(Image.FromStream(ResourceLoader.LoadResource(null, stageList[i].Item2) ?? System.IO.Stream.Null), new Rectangle(ogn.X + 64, ogn.Y + 8, 72, 72));
                     g.DrawRoundedRectangle(new Pen(Color.White, 3f), new Rectangle(ogn, new Size(200, 100)), 18);
                     g.DrawString(stageList[i].Item1, new Font(titlefont.FontFamily, 10f), Brushes.White, new Point(ogn.X + 100, ogn.Y + 100),
                     new StringFormat() { Alignment = StringAlignment.Center, LineAlignment = StringAlignment.Far });

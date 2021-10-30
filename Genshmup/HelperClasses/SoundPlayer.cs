@@ -30,6 +30,7 @@ namespace Genshmup.HelperClasses
             {
                 VolumeSampleProvider vsp = new(reader.ToSampleProvider());
                 vsp.Volume = _sfxvolume;
+                ap.Init(vsp);
             }
             else 
                 ap.Init(reader);
