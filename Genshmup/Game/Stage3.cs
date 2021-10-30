@@ -829,11 +829,11 @@ namespace Genshmup.Game
         {
             pos -= new Vector2(boss.Position.X, boss.Position.Y);
 
-            Polar polar = new(pos.Length(), (float)Math.Atan2(pos.Y, pos.X));
-            polar.radius += 2.2f;
-            polar.angle += 0.262f * MathF.Cos(polar.radius / 10f) * 10.0f / polar.radius;
+            Polar bear = new(pos.Length(), (float)Math.Atan2(pos.Y, pos.X));
+            bear.radius += 2.2f;
+            bear.angle += 0.262f * MathF.Cos(bear.radius / 10f) * 10.0f / bear.radius;
 
-            return new Vector2(boss.Position.X, boss.Position.Y) + new Vector2(polar.radius * (float)Math.Cos(polar.angle), polar.radius * (float)Math.Sin(polar.angle));
+            return new Vector2(boss.Position.X, boss.Position.Y) + new Vector2(bear.radius * (float)Math.Cos(bear.angle), bear.radius * (float)Math.Sin(bear.angle));
         }
     }
 }
